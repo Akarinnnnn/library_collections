@@ -157,6 +157,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="KTEXAtlas.h" />
     <ClInclude Include="resource1.h" />
     <ClInclude Include="squish\alpha.h" />
     <ClInclude Include="squish\clusterfit.h" />
@@ -178,6 +179,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="KTEXAtlas.cpp" />
     <ClCompile Include="squish\alpha.cpp" />
     <ClCompile Include="squish\clusterfit.cpp" />
     <ClCompile Include="squish\colourblock.cpp" />

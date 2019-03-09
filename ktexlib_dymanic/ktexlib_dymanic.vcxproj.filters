@@ -19,6 +19,9 @@
     <Filter Include="源文件\squish">
       <UniqueIdentifier>{d64a4920-7b94-4467-ab10-d031c27ad431}</UniqueIdentifier>
     </Filter>
+    <Filter Include="源文件\KTEX">
+      <UniqueIdentifier>{066a1556-ddc2-44a5-8b42-101bf4ddd60d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -75,6 +78,9 @@
     <ClInclude Include="resource1.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="KTEXAtlas.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -111,7 +117,10 @@
       <Filter>源文件\squish</Filter>
     </ClCompile>
     <ClCompile Include="TEXFileOperation.cpp">
-      <Filter>源文件\squish</Filter>
+      <Filter>源文件\KTEX</Filter>
+    </ClCompile>
+    <ClCompile Include="KTEXAtlas.cpp">
+      <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
