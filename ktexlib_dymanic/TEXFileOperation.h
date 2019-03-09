@@ -117,6 +117,7 @@ namespace ktexlib
 		
 		typedef std::vector<mipmapv2> mipmaps;
 		typedef std::vector<RGBAv2> imgs;
+
 		class KTEX
 		{
 		public:
@@ -131,7 +132,7 @@ namespace ktexlib
 			__API void clear();
 			__API KTEX();
 			__API ~KTEX();
-			__API friend void KTEX2PNG(KTEX target);
+			//__API friend void ktexlib::KTEXFileOperation::KTEX2PNG(KTEX target);
 			__API void operator+=(RGBAv2 src);
 			__API RGBAv2* operator[](int i);
 
@@ -142,7 +143,7 @@ namespace ktexlib
 			KTEXHeader Header;
 			imgs RGBA_vectors;
 		};
+		//__API void KTEX2PNG(KTEX target);
 		__API KTEX operator+(KTEX dest, RGBAv2 src);
-		__API void KTEX2PNG(KTEX target);
 	}
 }

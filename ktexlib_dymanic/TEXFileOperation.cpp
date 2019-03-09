@@ -5,45 +5,65 @@
 #include "TEXFileOperation.h"
 #include <Windows.h>
 #include "resource1.h"
-inline ktexlib::KTEXFileOperation::mipmapv2 夹带私货()
+inline ktexlib::KTEXFileOperation::RGBAv2 夹带私货()
 {
 	HINSTANCE HI = (HINSTANCE)GetModuleHandleW(L"ktexlib_dymanic.dll");
-
-	HBITMAP HBmp;
-	BITMAP Bmp;
-	HDC hdc = CreateICW(L"DISPLAY", NULL, NULL, NULL);
+	HDC hdc = CreateCompatibleDC(GetDC(GetDesktopWindow()));
+	HBITMAP hbmp;
+	BITMAP bmp;
+	char* rawdata = nullptr;
+	ktexlib::KTEXFileOperation::RGBAv2 ret;
 	srand((unsigned int)time(nullptr));
-	//switch ((unsigned int)floor(rand() % 10))
-	switch (1)
+	switch ((unsigned int)floor(rand() % 21))
+	//switch (1) //测试用
 	{
 	case(1):
-		HBmp = LoadBitmapW(HI, MAKEINTRESOURCEW(IDB_BITMAP1));
+		hbmp = (HBITMAP)LoadImageW(HI, L"#102",0,0,0,LR_CREATEDIBSECTION);
 		break;
 	case(2):
-		HBmp = LoadBitmapW(HI, MAKEINTRESOURCEW(IDB_BITMAP2));
+		hbmp = (HBITMAP)LoadImageW(HI, L"#103",0,0,0,LR_CREATEDIBSECTION);
 		break;
 	case(3):
-		HBmp = LoadBitmapW(HI, MAKEINTRESOURCEW(IDB_BITMAP3));
+		hbmp = (HBITMAP)LoadImageW(HI, L"#104",0,0,0,LR_CREATEDIBSECTION);
 		break;
 	default:
-		return ktexlib::KTEXFileOperation::mipmapv2{ 0 };
+		return ktexlib::KTEXFileOperation::RGBAv2{ 0 };
 	}
-	GetObjectW(HBmp, sizeof(BITMAP), &Bmp);
-	size_t datasize = Bmp.bmHeight*Bmp.bmWidth * 4;
-	auto bits = new char[datasize];
-	if (!GetDIBits(hdc, HBmp, 1, Bmp.bmHeight, bits, NULL, DIB_RGB_COLORS))
+	GetObjectW(hbmp, sizeof(BITMAP), &bmp);
+	if (hbmp != 0)
 	{
-		return ktexlib::KTEXFileOperation::mipmapv2{ 0 };
+		ret =
+		{
+			
+			(unsigned short)(bmp.bmWidthBytes / bmp.bmBitsPixel * 8),
+			(unsigned short)bmp.bmHeight,
+			0x001FUi16,
+		};
+		{
+			size_t size = (size_t)(bmp.bmHeight*bmp.bmWidthBytes / 3) * 4Ui64;
+			switch (bmp.bmBitsPixel)
+			{
+			case 32:
+				rawdata = new char[bmp.bmHeight*bmp.bmWidthBytes];
+				memcpy_s(rawdata, bmp.bmHeight*bmp.bmWidthBytes, bmp.bmBits, bmp.bmHeight*bmp.bmWidthBytes);
+				break;
+			case 24:
+				ret.data.resize(size);
+				for (size_t i = 0; i < size/8; i++)
+				{
+					*(ret.data.data() + i)		= *((char*)bmp.bmBits + i);
+					*(ret.data.data() + i + 1)	= *((char*)bmp.bmBits + i + 1);
+					*(ret.data.data() + i + 2)	= *((char*)bmp.bmBits + i + 2);
+					*(ret.data.data() + i + 3)	= 0x00Ui8;
+				}
+				break;
+			default:
+				return ktexlib::KTEXFileOperation::RGBAv2();
+			}
+		}
+		return ret;
 	}
-	ktexlib::KTEXFileOperation::mipmapv2 ret =
-	{
-		Bmp.bmWidth,
-		Bmp.bmHeight,
-		31
-	};
-	ret.size = datasize;
-	ret.data = bits;
-	return ret;
+	return ktexlib::KTEXFileOperation::RGBAv2();
 }
 
 
@@ -92,21 +112,37 @@ inline void __fastcall parseheader(ktexlib::KTEXFileOperation::KTEXHeader header
 	info.platform		 = (ktexlib::KTEXFileOperation::platfrm)(header.firstblock & 0x0000000F) ;
 }
 
-__API void ktexlib::KTEXFileOperation::KTEX::PushRGBA(ktexlib::KTEXFileOperation::RGBAv2 RGBA_array)
+__API void ktexlib::KTEXFileOperation::KTEX::PushRGBA(RGBAv2 tgt)
 {
-	this->RGBA_vectors.push_back(RGBA_array);
+	tgt.pitch = RGBA_vectors.size() + 1;
+	Info.mipscount++;
+	this->RGBA_vectors.push_back(tgt);
 }
 
 __API void ktexlib::KTEXFileOperation::KTEX::PushRGBA(RGBAv2 RGBA_array, unsigned int pitch)
 {
 	RGBA_array.pitch = pitch;
+	Info.mipscount++;
 	this->RGBA_vectors.push_back(RGBA_array);
 }
 
 __API void ktexlib::KTEXFileOperation::KTEX::Convert()
 {
-	//生成mipmaps
 	this->mipmaps.clear();
+	//随机抽取幸运用户夹带私货
+	if (Info.mipscount > 0x1F)
+	{
+		throw std::out_of_range("too much mipmaps, max 31.");
+	}
+	if (!(Info.mipscount == 0x1F))
+	{
+		auto si_huo = 夹带私货();
+		if (si_huo.height != 0)
+		{
+			RGBA_vectors.push_back(si_huo);
+		}
+	}
+	//生成mipmaps
 	for (auto img : RGBA_vectors)
 	{
 		mipmapv2 temp;
@@ -158,22 +194,10 @@ __API void ktexlib::KTEXFileOperation::KTEX::Convert()
 		}
 		mipmaps.push_back(temp);
 	}
-	Info.mipscount = mipmaps.size();
+	//Info.mipscount = mipmaps.size();
 
 	//生成第一数据块
 	//必要检查
-	if (Info.mipscount > 0x1F)
-	{
-		throw std::out_of_range("too much mipmaps, max 31.");
-	}
-	if (!(Info.mipscount == 0x1F))
-	{
-		auto si_huo = 夹带私货();
-		if (si_huo.height != 0)
-		{
-			mipmaps.push_back(si_huo);
-		}
-	}
 
 	Header.firstblock = 0xFFF00000;//保留，不排除未来官方会用
 	Header.firstblock |= Info.flags << 18;
@@ -301,6 +325,7 @@ __API ktexlib::KTEXFileOperation::KTEX::~KTEX()
 
 __API void ktexlib::KTEXFileOperation::KTEX::operator+=(ktexlib::KTEXFileOperation::RGBAv2 src)
 {
+	Info.mipscount++;
 	this->RGBA_vectors.push_back(src);
 }
 
@@ -316,10 +341,10 @@ __API ktexlib::KTEXFileOperation::KTEX ktexlib::KTEXFileOperation::operator+(KTE
 	return temp;
 }
 
-__API void ktexlib::KTEXFileOperation::KTEX2PNG(KTEX target)
+/*__API void ktexlib::KTEXFileOperation::KTEX2PNG(KTEX target)
 {
 
-}
+}*/
 
 __API ktexlib::KTEXFileOperation::mipmapv2::~mipmapv2()
 {
