@@ -114,6 +114,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;KTEXLIBDYMANIC_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -148,6 +149,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;KTEXLIBDYMANIC_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <DisableLanguageExtensions>true</DisableLanguageExtensions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -157,6 +160,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="AltasGen.h" />
     <ClInclude Include="KTEXAtlas.h" />
     <ClInclude Include="resource1.h" />
     <ClInclude Include="squish\alpha.h" />
@@ -176,8 +180,10 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="TEXFileOperation.h" />
+    <ClInclude Include="ktexcommon.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AltasGen.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="KTEXAtlas.cpp" />
     <ClCompile Include="squish\alpha.cpp" />

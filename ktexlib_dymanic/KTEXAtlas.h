@@ -1,17 +1,23 @@
 #pragma once
+#include "ktexcommon.h"
 namespace ktexlib
 {
 	namespace Atlas
 	{
-		struct b_box//boundry box
+		class atlas
 		{
-			unsigned short width;
-			unsigned short hwight;
-			double x;//x offset
-			double y;//y offset
+		public:
+			atlas(std::filesystem::path path, std::wstring outputname, std::vector<rgbav2> images);
+			atlas(std::filesystem::path path, std::wstring outputname, std::vector<mipmapv2> mipmaps);
+			void xmlgen();
+		private:
+			std::vector<b_box> bboxes;
+			std::wstring path;
+			std::wstring outputname;
 		};
-		template <typename T>
-		/*class martix33
+		
+		/*template <typename T>
+		class martix33
 		{
 		private:
 			T data[3][3];

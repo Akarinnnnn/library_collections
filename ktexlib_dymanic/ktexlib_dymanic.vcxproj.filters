@@ -22,6 +22,9 @@
     <Filter Include="源文件\KTEX">
       <UniqueIdentifier>{066a1556-ddc2-44a5-8b42-101bf4ddd60d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="源文件\旧版参考">
+      <UniqueIdentifier>{e951fadf-2911-4237-b7c5-7efecb67743d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -81,6 +84,12 @@
     <ClInclude Include="KTEXAtlas.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="ktexcommon.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="AltasGen.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -120,7 +129,10 @@
       <Filter>源文件\KTEX</Filter>
     </ClCompile>
     <ClCompile Include="KTEXAtlas.cpp">
-      <Filter>源文件</Filter>
+      <Filter>源文件\KTEX</Filter>
+    </ClCompile>
+    <ClCompile Include="AltasGen.cpp">
+      <Filter>源文件\旧版参考</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
