@@ -7,9 +7,9 @@ namespace ktexlib
 		class atlas
 		{
 		public:
-			atlas(std::filesystem::path path, std::wstring outputname, std::vector<rgbav2> images);
-			atlas(std::filesystem::path path, std::wstring outputname, std::vector<mipmapv2> mipmaps);
-			void xmlgen();
+			__declspec(dllexport) atlas(std::filesystem::path path, std::wstring outputname, std::vector<rgbav2> images);
+			__declspec(dllexport) atlas(std::filesystem::path path, std::wstring outputname, std::vector<mipmapv2> mipmaps);
+			__declspec(dllexport) void xmlgen();
 		private:
 			std::vector<b_box> bboxes;
 			std::wstring path;

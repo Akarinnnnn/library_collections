@@ -150,7 +150,6 @@
       <PreprocessorDefinitions>NDEBUG;KTEXLIBDYMANIC_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <DisableLanguageExtensions>true</DisableLanguageExtensions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
