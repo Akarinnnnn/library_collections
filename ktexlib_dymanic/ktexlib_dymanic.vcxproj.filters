@@ -87,9 +87,6 @@
     <ClInclude Include="ktexcommon.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="AltasGen.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -130,9 +127,6 @@
     </ClCompile>
     <ClCompile Include="KTEXAtlas.cpp">
       <Filter>源文件\KTEX</Filter>
-    </ClCompile>
-    <ClCompile Include="AltasGen.cpp">
-      <Filter>源文件\旧版参考</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

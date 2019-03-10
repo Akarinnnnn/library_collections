@@ -13,7 +13,7 @@ namespace ktexlib
 		private:
 			std::vector<b_box> bboxes;
 			std::wstring path;
-			std::wstring outputname;
+			std::wstring texfilename;
 		};
 		
 		/*template <typename T>
