@@ -2,7 +2,7 @@
 #include "Martix33.h"
 //#include <array>
 using namespace Anim;
-Martix33& Anim::Martix33::Hadamart(Martix33& a)
+Martix33& Anim::Martix33::Hadamart(const Martix33& a)
 {
 	Martix33 ret;
 	for (int i = 0; i < 9; i++)
@@ -12,7 +12,7 @@ Martix33& Anim::Martix33::Hadamart(Martix33& a)
 	return ret;
 }
 
-Martix33& Anim::Martix33::operator*(Martix33& a)
+Martix33& Anim::Martix33::operator*(const Martix33& a)
 {
 	Martix33 ret;
 	for (int i = 0; i < 3; i++)
@@ -25,13 +25,14 @@ Martix33& Anim::Martix33::operator*(Martix33& a)
 
 Martix33& Anim::Martix33::operator-()
 {
-	for (auto elem:data)
+	for (int i=0;i<9;i++)
 	{
-		*elem = -(*elem);
+		float& elem = *((float*)(data)+i);
+		elem = -elem;
 	}
 }
 
-Martix33& Anim::Martix33::operator-(Martix33 a)
+Martix33& Anim::Martix33::operator-(const Martix33& a)
 {
 	Martix33 ret;
 	for (int i = 0; i < 9; i++)
@@ -41,22 +42,12 @@ Martix33& Anim::Martix33::operator-(Martix33 a)
 	return ret;
 }
 
-Martix33& Anim::Martix33::operator+(Martix33& a)
+Martix33& Anim::Martix33::operator+(const Martix33& a)
 {
 	Martix33 ret;
 	for (int i = 0; i < 9; i++)
 	{
 		*(float*)(ret.data + i) = *((float*)this->data + i) + *((float*)a.data + i);
-	}
-	return ret;
-}
-
-Martix33& Anim::Martix33::operator/(Martix33 a)
-{
-	Martix33 ret;
-	for (int i = 0; i < 9; i++)
-	{
-		*(float*)(ret.data + i) = *((float*)this->data + i) / *((float*)a.data + i);
 	}
 	return ret;
 }
