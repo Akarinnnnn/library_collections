@@ -1,11 +1,12 @@
 #pragma once
 namespace Anim
 {
-	template <typename T>
-	struct pt2
+	struct xy
 	{
-		T x, y = 0;
+		float x, y = 0.0;
 	};
-	typedef pt2<float> xy;
-	typedef pt2<int> wh;
+	struct wh
+	{
+		int w, h = 0;
+	};
 }

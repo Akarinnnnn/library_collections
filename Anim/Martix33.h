@@ -1,24 +1,19 @@
 #pragma once
-#include "Anim.h"
+#include "xywh.h"
+
 namespace Anim
 {
 	class __declspec(dllexport) Martix33
 	{
 	public:
-		Martix33 operator*(Martix33);
-		Martix33 operator-();
-		Martix33 operator-(Martix33);
-		Martix33 operator+(Martix33);
-		Martix33 operator/(Martix33);
-		Martix33& get_translation();
-		void set_translation(float, float);
-	private:
+		Martix33& Hadamart(Martix33&);
+		Martix33& operator*(Martix33&);
+		Martix33& operator-();
+		Martix33& operator-(Martix33);
+		Martix33& operator+(Martix33&);
+		Martix33& operator/(Martix33);
+		xy& get_translation();
+		Martix33& set_translation(float, float);
 		float data[3][3];
-	};
-	struct xy
-	{
-		float x = 0.0f;
-		float y = 0.0f;
-
 	};
 }

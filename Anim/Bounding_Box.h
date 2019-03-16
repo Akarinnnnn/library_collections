@@ -16,8 +16,12 @@ namespace Anim
 	public:
 		Bounding_Box();
 		Bounding_Box(float x, float y, unsigned int w, unsigned int h);
-		explicit Bounding_Box(Anim::Rectangle& const rect);
-		explicit Bounding_Box(Anim::xy& xy, Anim::wh& wh);
+		Bounding_Box(const Anim::Rectangle& rect);
+		Bounding_Box(const Anim::xy& xy,const Anim::wh& wh);
+
+		void scale(float muliply);
+		void spilt(Anim::xy& xy, Anim::wh& wh);
+
 		~Bounding_Box();
 	};
 }
