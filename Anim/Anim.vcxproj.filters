@@ -39,6 +39,9 @@
     <ClInclude Include="xywh.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="scml.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -59,5 +62,8 @@
     <ClCompile Include="Bounding_Box.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>
