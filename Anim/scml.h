@@ -28,11 +28,13 @@ namespace Anim
 			std::wstring name;
 			float x, y = 0.0f;
 			float angle = 0.0f;//radius angle
+			float scale = 0.0f;
 		};
 		struct object
 		{
 			unsigned int id = 0;
 			unsigned int folder,file = 0;
+			float scale = 0.0f;
 		};
 		class key
 		{
