@@ -21,55 +21,24 @@
     <ClInclude Include="targetver.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Anim.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Martix33.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Util.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Bounding_Box.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Rectangle.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="xywh.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="scml.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Anim.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="dllmain.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Martix33.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Util.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Bounding_Box.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="scml.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Rectangle.cpp">
+    <ClCompile Include="unittest1.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <None Include="Fa.scml">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="m16a4.scml">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="swap_m16a4.scml">
+      <Filter>资源文件</Filter>
+    </None>
   </ItemGroup>
 </Project>

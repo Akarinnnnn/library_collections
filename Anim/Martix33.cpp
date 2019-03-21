@@ -2,7 +2,7 @@
 #include "Martix33.h"
 //#include <array>
 using namespace Anim;
-Martix33& Anim::Martix33::Hadamart(const Martix33& a)
+Martix33 Anim::Martix33::Hadamart(const Martix33 a)
 {
 	Martix33 ret;
 	for (int i = 0; i < 9; i++)
@@ -12,7 +12,7 @@ Martix33& Anim::Martix33::Hadamart(const Martix33& a)
 	return ret;
 }
 
-Martix33& Anim::Martix33::operator*(const Martix33& a)
+Martix33 Anim::Martix33::operator*(const Martix33& a)
 {
 	Martix33 ret;
 	for (int i = 0; i < 3; i++)
@@ -30,9 +30,10 @@ Martix33& Anim::Martix33::operator-()
 		float& elem = *((float*)(data)+i);
 		elem = -elem;
 	}
+	return *this;
 }
 
-Martix33& Anim::Martix33::operator-(const Martix33& a)
+Martix33 Anim::Martix33::operator-(const Martix33& a)
 {
 	Martix33 ret;
 	for (int i = 0; i < 9; i++)
@@ -42,7 +43,7 @@ Martix33& Anim::Martix33::operator-(const Martix33& a)
 	return ret;
 }
 
-Martix33& Anim::Martix33::operator+(const Martix33& a)
+Martix33 Anim::Martix33::operator+(const Martix33& a)
 {
 	Martix33 ret;
 	for (int i = 0; i < 9; i++)
@@ -52,7 +53,7 @@ Martix33& Anim::Martix33::operator+(const Martix33& a)
 	return ret;
 }
 
-xy & Anim::Martix33::get_translation()
+xy Anim::Martix33::get_translation()
 {
 	return xy() = { data[0][2],data[1][2] };
 }
@@ -61,4 +62,5 @@ Martix33& Anim::Martix33::set_translation(float x, float y)
 {
 	data[0][2] = x;
 	data[1][2] = y;
+	return *this;
 }

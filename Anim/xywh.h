@@ -7,6 +7,6 @@ namespace Anim
 	};
 	struct wh
 	{
-		int w, h = 0;
+		unsigned int w, h = 0;
 	};
 }
