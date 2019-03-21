@@ -62,6 +62,9 @@
     <ClCompile Include="Bounding_Box.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="scml.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
