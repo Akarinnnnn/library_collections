@@ -2,6 +2,10 @@
 #include "Martix33.h"
 //#include <array>
 using namespace Anim;
+Anim::Martix33::Martix33()
+{
+
+}
 Martix33 Anim::Martix33::Hadamart(const Martix33 a)
 {
 	Martix33 ret;
@@ -58,9 +62,23 @@ xy Anim::Martix33::get_translation()
 	return xy() = { data[0][2],data[1][2] };
 }
 
+Martix33 & Anim::Martix33::scale(float mp)
+{
+	data[0][0] *= mp;
+	data[1][1] *= mp;
+	return *this;
+}
+
 Martix33& Anim::Martix33::set_translation(float x, float y)
 {
 	data[0][2] = x;
 	data[1][2] = y;
+	return *this;
+}
+
+Martix33 & Anim::Martix33::set_translation(xy v)
+{
+	data[0][2] = v.x;
+	data[1][2] = v.y;
 	return *this;
 }

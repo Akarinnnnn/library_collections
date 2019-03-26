@@ -2,5 +2,9 @@
 //
 
 #include "stdafx.h"
+#include "Anim.h"
 
+void Anim::SCML2Anim(std::wstring SCMLPath)
+{
 
+}

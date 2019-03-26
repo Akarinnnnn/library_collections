@@ -4,5 +4,5 @@
 #include "Util.h"
 namespace Anim
 {
-
+	void SCML2Anim(std::wstring SCMLPath);
 }
