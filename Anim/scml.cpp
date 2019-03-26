@@ -1,11 +1,12 @@
 #include "stdafx.h"
 #include "scml.h"
+#include <string>
 #include <pugiconfig.hpp>
 #include <pugixml.hpp>
-
+#include <iostream>
 using namespace Anim::SCML;
 using namespace std;
-scml Anim::SCML::ReadSCML(std::wstring path)
+__declspec(dllexport) scml Anim::SCML::ReadSCML(std::wstring path)
 {
 	using namespace pugi;
 	xml_document scmldoc;
@@ -13,6 +14,12 @@ scml Anim::SCML::ReadSCML(std::wstring path)
 	auto root = scmldoc.child(L"spriter_data");
 	vector<folder> folders;
 	vector<entity> entities;
+#ifdef _DEBUG
+	for (auto info:scmldoc.children())
+	{
+		wprintf_s(info.value());
+	}
+#endif // _DEBUG
 
 	for (auto _folder : root.children(L"folder"))
 	{

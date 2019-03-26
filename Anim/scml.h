@@ -3,18 +3,18 @@
 #include <vector>
 namespace Anim
 {
-	namespace SCML//klei特化
+	namespace  SCML//klei特化
 	{
-		class file
+		struct __declspec(dllexport) file
 		{
 		public:
 			unsigned int id = 0;
-			unsigned int w, h = 0;
-			float x, y = 0.0F;
+			unsigned int w=0, h = 0;
+			float x=0.0f, y = 0.0F;
 			std::wstring name;
 		};
 
-		class folder
+		struct __declspec(dllexport) folder
 		{
 		public:
 			std::vector<file> files;
@@ -22,43 +22,43 @@ namespace Anim
 			unsigned int id=0;
 		};
 		
-		struct object_ref
+		struct __declspec(dllexport) object_ref
 		{
 		public:
 			unsigned int id = 0;
 			std::wstring name;
-			unsigned int folder, file = 0;
+			unsigned int folder=0, file = 0;
 			unsigned int z_index = 0;
-			float x, y = 0.0f;
+			float x=0.0f, y = 0.0f;
 			float angle = 0.0f;//0~360°,将转换到弧度制
 			float xscale = 0.0f;
 			float yscale = 0.0f;
 		};
 
-		struct object
+		struct __declspec(dllexport) object
 		{
 		public:
 			unsigned int id = 0;
-			unsigned int folder,file = 0;
-			float x, y = 0.0f;
-			float xscale,yscale = 0.0f;
+			unsigned int folder=0,file = 0;
+			float x=0.0f, y = 0.0f;
+			float xscale = 0.0f,yscale = 0.0f;
 		};
 
-		class key
+		struct __declspec(dllexport) key
 		{
 		public:
 			std::vector<object> objects;
 			unsigned int id = 0;
 		};
 
-		class key_mainline
+		struct __declspec(dllexport) key_mainline
 		{
 		public:
 			std::vector<object_ref> object_refs;
 			unsigned int id = 0;
 		};
 
-		class timeline
+		struct __declspec(dllexport) timeline
 		{
 		public:
 			std::vector<key_mainline> keys;
@@ -66,13 +66,13 @@ namespace Anim
 			unsigned int length=0;
 		};
 
-		class _mainline
+		struct __declspec(dllexport) _mainline
 		{
 		public:
 			std::vector<key_mainline> keys;
 		};
 
-		class animation
+		struct __declspec(dllexport) animation
 		{
 		public:
 			_mainline mainline;
@@ -82,7 +82,7 @@ namespace Anim
 			unsigned int length=0;//frame
 		};
 
-		class entity
+		struct __declspec(dllexport) entity
 		{
 		public:
 			std::wstring name;
@@ -90,12 +90,12 @@ namespace Anim
 			unsigned int id=0;
 		};
 
-		struct scml
+		struct __declspec(dllexport) scml
 		{
 			std::vector<folder> folder;
 			std::vector<entity> entity;
 		};
 
-		scml ReadSCML(std::wstring path);
+		__declspec(dllexport) scml ReadSCML(std::wstring path);
 	}
 }

@@ -3,7 +3,7 @@
 #include "xywh.h"
 namespace Anim
 {
-	class Bounding_Box
+	 class __declspec(dllexport) Bounding_Box
 	{
 	private:
 		float x, y;

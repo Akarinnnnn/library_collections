@@ -5,16 +5,22 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace Animtest
 {		
-	TEST_CLASS(UnitTest1)
+	TEST_CLASS(SCMLtest)
 	{
 	public:
 		
-		TEST_METHOD(TestMethod1)
+		TEST_METHOD(ReadTest)
 		{
 			auto r1 = Anim::SCML::ReadSCML(L".\\Fa.scml");
 			auto r2 = Anim::SCML::ReadSCML(L".\\m16a4.scml");
 			auto r3 = Anim::SCML::ReadSCML(L".\\swap_m16a4.scml");
-			system("pause");
+			Assert::AreEqual(14Ui64, r1.folder.size());
+			Assert::AreEqual(1Ui64, r1.folder.size());
+			Assert::AreEqual(1Ui64, r1.folder.size());
 		}
 	};
 }
+/*int main()
+{
+	Animtest::SCMLtest().ReadTest();
+}*/

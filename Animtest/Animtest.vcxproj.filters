@@ -26,19 +26,19 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="unittest1.cpp">
+    <ClCompile Include="SCMLtest.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Fa.scml">
+    <CopyFileToFolders Include="Fa.scml">
       <Filter>资源文件</Filter>
-    </None>
-    <None Include="m16a4.scml">
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="m16a4.scml">
       <Filter>资源文件</Filter>
-    </None>
-    <None Include="swap_m16a4.scml">
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="swap_m16a4.scml">
       <Filter>资源文件</Filter>
-    </None>
+    </CopyFileToFolders>
   </ItemGroup>
 </Project>
