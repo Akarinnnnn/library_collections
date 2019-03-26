@@ -61,9 +61,9 @@ namespace Anim
 		struct __declspec(dllexport) timeline
 		{
 		public:
-			std::vector<key_mainline> keys;
+			std::vector<key> keys;
+			std::wstring name;
 			unsigned int id=0;
-			unsigned int length=0;
 		};
 
 		struct __declspec(dllexport) _mainline

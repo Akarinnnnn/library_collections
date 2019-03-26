@@ -49,7 +49,7 @@ __declspec(dllexport) scml Anim::SCML::ReadSCML(std::wstring path)
 			vector<timeline> timelines;
 			_mainline mainline;
 			{
-				vector<key_mainline> keys;
+				vector<key_mainline>& keys = mainline.keys;
 				for (auto _k : _anim.child(L"mainline").children(L"key"))
 				{
 					std::vector<object_ref> object_refs;
@@ -102,7 +102,14 @@ __declspec(dllexport) scml Anim::SCML::ReadSCML(std::wstring path)
 					temp.id = _k.attribute(L"id").as_uint();
 					keys.push_back(temp);
 				}
-
+				timelines.push_back(
+					timeline() =
+					{
+						keys,
+						_tl.attribute(L"name").as_string(),
+						_tl.attribute(L"id").as_uint()
+					}
+				);
 			}
 			animations.push_back(animation() =
 				{
