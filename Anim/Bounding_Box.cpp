@@ -3,11 +3,6 @@
 #include "Bounding_Box.h"
 using namespace Anim;
 
-Anim::Bounding_Box::Bounding_Box()
-{
-	x, y, w, h = 0;
-}
-
 Anim::Bounding_Box::Bounding_Box(float x, float y, unsigned int w, unsigned int h)
 {
 	set(x, y, w, h);

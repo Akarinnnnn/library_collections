@@ -1,10 +1,9 @@
-#define __API __declspec(dllexport)
-
 #include "lodepng.h"
 #include "./squish/squish.h"
 #include "TEXFileOperation.h"
 #include <Windows.h>
 #include "resource1.h"
+#include "KTEXAtlas.h"
 inline ktexlib::KTEXFileOperation::RGBAv2 夹带私货()
 {
 	HINSTANCE HI = (HINSTANCE)GetModuleHandleW(L"ktexlib_dymanic.dll");
@@ -66,29 +65,6 @@ inline ktexlib::KTEXFileOperation::RGBAv2 夹带私货()
 	return ktexlib::KTEXFileOperation::RGBAv2();
 }
 
-
-template<typename T>
-inline bool ArrayCompare(T array1[], const T array2[], unsigned long long count)
-{
-	//UINT64 p1,p2 =(UINT64*)array1,(UINT64*)array2
-	for (unsigned long long i = 0; i < count; i++)
-	{
-		if (*(array1 + i) != *(array2 + i))
-		{
-			return false;
-		}
-	}
-	return true;
-}
-
-struct mipmapinfile
-{
-	unsigned short x = 0;
-	unsigned short y = 0;
-	unsigned short z = 0;
-	unsigned int size = 0;
-};
-
 char* ReverseByByte(char* p, unsigned long long bytecount)//p强制转换就行
 {
 	char mid = 0;
@@ -103,7 +79,7 @@ char* ReverseByByte(char* p, unsigned long long bytecount)//p强制转换就行
 
 using namespace std;
 
-inline void __fastcall parseheader(ktexlib::KTEXFileOperation::KTEXHeader header, ktexlib::KTEXFileOperation::KTEXInfo& info)
+inline void __fastcall parseheader(ktexlib::KTEXFileOperation::KTEXHeader& header, ktexlib::KTEXFileOperation::KTEXInfo& info)
 {
 	info.flags			 = (header.firstblock & 0x000C0000) >>18;
 	info.mipscount		 = (header.firstblock & 0x0003E000) >>13;
@@ -149,12 +125,13 @@ __API void ktexlib::KTEXFileOperation::KTEX::Convert()
 		temp.height = img.height;
 		temp.width = img.width;
 		temp.pitch = img.pitch;
-		//上下翻转
+		//上下翻转，针对OpenGL而言
+		//不过应该只有OpenGL（PC）会用这个工具
 		unsigned int* p_imgvec = (unsigned int*)img.data.data();
 		for (unsigned short y = 0Ui16; y < img.height / 2Ui16; y++)
 		{
 			auto curline = (unsigned int*)p_imgvec + ((size_t)y * (size_t)img.width);
-			auto tgtline = (unsigned int*)p_imgvec + ((size_t)(img.height - y - 1Ui16)*(size_t)img.width);
+			auto tgtline = (unsigned int*)p_imgvec + (((size_t)img.height - (size_t)y - (size_t)1Ui16)*(size_t)img.width);
 			for (unsigned short x = 0; x < img.width; x++)
 			{
 				unsigned int temp = *(tgtline + x);
@@ -210,13 +187,17 @@ __API void ktexlib::KTEXFileOperation::KTEX::Convert()
 	//写入文件
 	ofstream file(output, ios::trunc | ios::binary);
 	file.write((char*)(&this->Header), 8);//文件头(CC4+第一数据块)
-	for (auto mipmap : this->mipmaps)//分别写入mipmaps
+	for (auto& mipmap : this->mipmaps)//分别写入mipmaps
 	{
 		file.write((char*)(&mipmap), 6);
 		file.write((char*)(&mipmap.size), 4);
 		file.write(mipmap.data, mipmap.size);
 	}
 	file.close();
+
+	//生成XML
+	Atlas::atlas xmlop(this->output, mipmaps);
+	xmlop.xmlgen();
 }
 
 __API void ktexlib::KTEXFileOperation::KTEX::LoadKTEX(std::experimental::filesystem::path filepath)
@@ -254,12 +235,12 @@ __API ktexlib::KTEXFileOperation::mipmapv2 ktexlib::KTEXFileOperation::KTEX::Get
 	throw std::invalid_argument("no such mipmap");
 }
 
-__API ktexlib::KTEXFileOperation::mipmapv2 ktexlib::KTEXFileOperation::KTEX::GetMipmap(size_t order)
+__API ktexlib::KTEXFileOperation::mipmapv2 ktexlib::KTEXFileOperation::KTEX::GetMipmap(unsigned int order)
 {
 	return this->mipmaps[order];
 }
 
-__API ktexlib::KTEXFileOperation::RGBAv2 ktexlib::KTEXFileOperation::KTEX::GetImageFromMipmap(size_t order)
+__API ktexlib::KTEXFileOperation::RGBAv2 ktexlib::KTEXFileOperation::KTEX::GetImageFromMipmap(unsigned int order)
 {
 	auto& tmpmipmap = this->mipmaps[order];
 	RGBAv2 tempRGBA =
@@ -270,7 +251,7 @@ __API ktexlib::KTEXFileOperation::RGBAv2 ktexlib::KTEXFileOperation::KTEX::GetIm
 	};
 	if (Info.pixelformat == pixfrm::ARGB)
 	{
-		tempRGBA.data.reserve(tmpmipmap.size + 10);
+		tempRGBA.data.reserve((size_t)tmpmipmap.size + 10Ui64);
 		tempRGBA.data.assign(tmpmipmap.data, tmpmipmap.data + tmpmipmap.size + 1);
 	}
 	else
@@ -290,7 +271,7 @@ __API ktexlib::KTEXFileOperation::RGBAv2 ktexlib::KTEXFileOperation::KTEX::GetIm
 		default:
 			throw KTEXexception("Invalid pixelformat", 2);
 		}
-		tempRGBA.data.resize(tmpmipmap.height * tmpmipmap.width * 4);
+		tempRGBA.data.resize((size_t)tmpmipmap.height * (size_t)tmpmipmap.width * 4Ui64);
 		squish::DecompressImage(tempRGBA.data.data(), tmpmipmap.width, tmpmipmap.height, tmpmipmap.data, flag);
 	}
 	return tempRGBA;
@@ -340,11 +321,6 @@ __API ktexlib::KTEXFileOperation::KTEX ktexlib::KTEXFileOperation::operator+(KTE
 	temp.PushRGBA(R);
 	return temp;
 }
-
-/*__API void ktexlib::KTEXFileOperation::KTEX2PNG(KTEX target)
-{
-
-}*/
 
 __API ktexlib::KTEXFileOperation::mipmapv2::~mipmapv2()
 {

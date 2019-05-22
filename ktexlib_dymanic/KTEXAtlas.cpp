@@ -18,16 +18,15 @@ bool inline operator<= (b_box l, b_box r)
 		);
 }
 
-ktexlib::Atlas::atlas::atlas(std::filesystem::path path, std::wstring outputname, vector<ktexlib::rgbav2> imgs)
+ktexlib::Atlas::atlas::atlas(std::wstring output, vector<ktexlib::KTEXFileOperation::RGBAv2>& imgs)
 {
-	this->path = path.wstring();
-	this->texfilename = outputname;
-	for (auto img : imgs)
+	this->path = output;
+	for (auto& img : imgs)
 	{
 		b_box tmp = 
 		{
-			img.w,
-			img.h,
+			img.width,
+			img.height,
 			0.5,
 			0.5
 		};
@@ -35,17 +34,16 @@ ktexlib::Atlas::atlas::atlas(std::filesystem::path path, std::wstring outputname
 	}
 }
 
-ktexlib::Atlas::atlas::atlas(std::filesystem::path path, std::wstring outputname, vector<ktexlib::mipmapv2> m)
+ktexlib::Atlas::atlas::atlas(std::wstring output, vector<ktexlib::KTEXFileOperation::mipmapv2>& m)
 {
-	this->path = path.wstring();
-	this->texfilename = outputname;
-	for (auto mipmap : m)
+	this->path = output;
+	for (auto& mipmap : m)
 	{
 		b_box tmp = 
 		{
-			mipmap.w,
-			mipmap.h,
-			0.5,
+			mipmap.width,
+			mipmap.height,
+			0.5,//根据官方说法，这两个0.5是为了避免出现采样问题，可能跟klei的游戏引擎有关
 			0.5
 		};
 		bboxes.push_back(tmp);
@@ -56,31 +54,32 @@ void ktexlib::Atlas::atlas::xmlgen()
 {
 	using namespace pugi;
 	xml_document document;
+	
 	auto Atlas = document.append_child(L"Atlas");
 	auto Texture = Atlas.append_child(L"Texture");
 	{
 		auto rootfilename = Texture.append_attribute(L"filename");
-		rootfilename.set_value(texfilename.c_str());
+		rootfilename.set_value(path.filename().wstring().c_str());
 	}
 	auto Elements = Atlas.append_child(L"Elements");
-	for (auto bbox : bboxes)
+	for (auto&& bbox : bboxes)
 	{
-		double u1, v1, u2, v2 = 0.0;
+		float u1, v1, u2, v2 = 0.0;
 		unsigned short w2, h2 = 0;//texture size
 
 		w2 = next2n(bbox.w);
 		h2 = next2n(bbox.h);
 		
-		double boff[2] = { bbox.w / w2,bbox.h / h2 };//border offset
+		float boffset[2] = { bbox.w / w2,bbox.h / h2 };//border offset
 
-		u1 = clamp(bbox.x / (double)w2 + boff[0], 0.0, 1.0);
-		u2 = clamp(1.0 - bbox.x + bbox.w / (double)w2 - boff[0], 0.0, 1.0);
+		u1 = clamp<float>(bbox.x / w2 + boffset[0], 0.0f, 1.0f);
+		u2 = clamp<float>(1.0f - bbox.x + bbox.w / w2 - boffset[0], 0.0f, 1.0f);
 
-		v1 = clamp(bbox.y / (double)h2 + boff[1], 0.0, 1.0);
-		v2 = clamp(1.0 - bbox.y + bbox.h / (double)h2 - boff[1], 0.0, 1.0);
+		v1 = clamp<float>(bbox.y / h2 + boffset[1], 0.0f, 1.0f);
+		v2 = clamp<float>(1.0f - bbox.y + bbox.h / h2 - boffset[1], 0.0f, 1.0f);
 
 		auto Element = Elements.append_child(L"Element");
-		Element.append_attribute(L"name").set_value(texfilename.c_str());
+		Element.append_attribute(L"name").set_value(path.wstring().c_str());
 		Element.append_attribute(L"u1").set_value(u1);
 		Element.append_attribute(L"v1").set_value(v1);
 		Element.append_attribute(L"u2").set_value(u2);

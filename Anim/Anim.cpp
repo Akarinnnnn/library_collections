@@ -3,8 +3,10 @@
 
 #include "stdafx.h"
 #include "Anim.h"
-
-void Anim::SCML2Anim(std::wstring SCMLPath)
+#include "Util.h"
+using namespace Anim;
+using namespace std;
+void Anim::SCML2Anim(Anim::SCML::scml src)
 {
-
+	
 }
