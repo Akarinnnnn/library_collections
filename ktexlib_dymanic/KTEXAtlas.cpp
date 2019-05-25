@@ -54,18 +54,19 @@ void ktexlib::Atlas::atlas::xmlgen()
 {
 	using namespace pugi;
 	xml_document document;
-	
+	wstring filename = path.filename().replace_extension(L".tex").wstring();// .c_str();
+
 	auto Atlas = document.append_child(L"Atlas");
 	auto Texture = Atlas.append_child(L"Texture");
 	{
 		auto rootfilename = Texture.append_attribute(L"filename");
-		rootfilename.set_value(path.filename().wstring().c_str());
+		rootfilename.set_value(filename.c_str());
 	}
 	auto Elements = Atlas.append_child(L"Elements");
 	for (auto&& bbox : bboxes)
 	{
-		float u1, v1, u2, v2 = 0.0;
-		unsigned short w2, h2 = 0;//texture size
+		float u1 = 0.0, v1 = 0.0, u2 = 0.0, v2 = 0.0;
+		unsigned short w2 = 0, h2 = 0;//texture size
 
 		w2 = next2n(bbox.w);
 		h2 = next2n(bbox.h);
@@ -79,11 +80,11 @@ void ktexlib::Atlas::atlas::xmlgen()
 		v2 = clamp<float>(1.0f - bbox.y + bbox.h / h2 - boffset[1], 0.0f, 1.0f);
 
 		auto Element = Elements.append_child(L"Element");
-		Element.append_attribute(L"name").set_value(path.wstring().c_str());
+		Element.append_attribute(L"name").set_value(filename.c_str());
 		Element.append_attribute(L"u1").set_value(u1);
 		Element.append_attribute(L"v1").set_value(v1);
 		Element.append_attribute(L"u2").set_value(u2);
 		Element.append_attribute(L"v2").set_value(v2);
 	}
-	document.save_file(path.c_str());
+	document.save_file(path.c_str(), L"\t", 1, pugi::encoding_utf8);
 }

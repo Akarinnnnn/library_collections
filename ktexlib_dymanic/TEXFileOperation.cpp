@@ -3,6 +3,7 @@
 #include "TEXFileOperation.h"
 #include <Windows.h>
 #include "resource1.h"
+#include <filesystem>
 #include "KTEXAtlas.h"
 inline ktexlib::KTEXFileOperation::RGBAv2 夹带私货()
 {
@@ -196,7 +197,7 @@ __API void ktexlib::KTEXFileOperation::KTEX::Convert()
 	file.close();
 
 	//生成XML
-	Atlas::atlas xmlop(this->output, mipmaps);
+	Atlas::atlas xmlop(filesystem::path(output).replace_extension(".xml").wstring(), mipmaps);
 	xmlop.xmlgen();
 }
 
