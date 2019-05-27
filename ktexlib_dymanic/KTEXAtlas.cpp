@@ -6,9 +6,20 @@ using namespace std;
 using namespace ktexlib::Atlas;
 using namespace ktexlib;
 
-unsigned short inline next2n(unsigned short a)
+bool __fastcall ispowerof2(unsigned short x)
 {
-	return a + (a % 2);
+	return !(x & (x - 1));
+}
+
+unsigned short inline next2pow(unsigned short x)
+{
+	x -= 1;
+	x |= x >> 16;
+	x |= x >> 8;
+	x |= x >> 4;
+	x |= x >> 2;
+	x |= x >> 1;
+	return x + 1;
 }
 
 bool inline operator<= (b_box l, b_box r)
@@ -68,12 +79,12 @@ void ktexlib::Atlas::atlas::xmlgen()
 		float u1 = 0.0, v1 = 0.0, u2 = 0.0, v2 = 0.0;
 		unsigned short w2 = 0, h2 = 0;//texture size
 
-		w2 = next2n(bbox.w);
-		h2 = next2n(bbox.h);
+		//w2 = next2pow(bbox.w);
+		//h2 = next2pow(bbox.h);
 		
-		float boffset[2] = { bbox.w / w2,bbox.h / h2 };//border offset
+		float boffset[2] = { 0.5f / w2,0.5f / h2 };//border offset
 
-		u1 = clamp<float>(bbox.x / w2 + boffset[0], 0.0f, 1.0f);
+		u1 = clamp<float>((bbox.x / w2) + boffset[0], 0.0f, 1.0f);
 		u2 = clamp<float>(1.0f - bbox.x + bbox.w / w2 - boffset[0], 0.0f, 1.0f);
 
 		v1 = clamp<float>(bbox.y / h2 + boffset[1], 0.0f, 1.0f);
