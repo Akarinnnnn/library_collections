@@ -10,6 +10,8 @@
 
 #include <filesystem>
 #include <vector>
+#include <exception>
+#include <cstdio>
 
 namespace ktexlib
 {
@@ -29,7 +31,7 @@ namespace ktexlib
 	{
 		enum class  platfrm//platform
 		{
-			opengl = 12,
+			opengl = 12,//mainly PC
 			xb360 = 11,
 			ps3 = 10,
 			unk = 0
@@ -39,7 +41,7 @@ namespace ktexlib
 			ARGB = 4,
 			DXT1 = 0,
 			DXT3 = 1,
-			DXT5 = 2,
+			DXT5 = 2,//BC3
 			unk = 7
 		};
 		enum class textyp //texture type
@@ -49,28 +51,34 @@ namespace ktexlib
 			d3 = 3,//3d
 			cube = 4//cubemap
 		};
-		class __API KTEXexception :public std::exception
+		class __API ktex_exception :public std::exception
 		{
 		public:
-			~KTEXexception() noexcept
+			~ktex_exception()
 			{
-				delete[] msg;
+				delete msg;
 			}
-			KTEXexception(const char* msg, int code) noexcept
+
+			ktex_exception(const char* msg, int code) noexcept
 			{
-				this->msg = msg;
 				this->_code = code;
+				size_t msgsize = strlen(msg) + 36;
+				this->msg = new char[msgsize];
+				sprintf_s(this->msg, msgsize, "ktex_exception:\n\t%s\n\tCode:0x%08X", msg, code);
 			}
-			char const* what() const noexcept
+			
+			virtual const char * what() const noexcept override
 			{
-				return msg;
+				return this->msg;
 			}
+
 			int const code() noexcept
 			{
 				return _code;
 			}
+		protected:
+			char* msg;
 		private:
-			char const* msg;
 			int _code;
 		};
 

@@ -206,12 +206,12 @@ __API void ktexlib::KTEXFileOperation::KTEX::LoadKTEX(std::experimental::filesys
 	fstream file(filepath, ios::in | ios::binary);
 	if (!file.is_open())
 	{
-		throw KTEXexception("failed to open specified file.", -1);
+		throw ktex_exception("failed to open specified file.", -1);
 	}
 	file.read((char*)(&this->Header), 8);
 	if (Header.cc4 != 0x5845544B)
 	{
-		throw KTEXexception("Invalid KTEX file.", 1);
+		throw ktex_exception("Invalid KTEX file.", 1);
 	}
 	output = filepath.stem().wstring() + L".tex";
 	parseheader(this->Header, this->Info);
@@ -270,7 +270,7 @@ __API ktexlib::KTEXFileOperation::RGBAv2 ktexlib::KTEXFileOperation::KTEX::GetIm
 			flag = squish::kDxt3;
 			break;
 		default:
-			throw KTEXexception("Invalid pixelformat", 2);
+			throw ktex_exception("Invalid pixelformat", 2);
 		}
 		tempRGBA.data.resize((size_t)tmpmipmap.height * (size_t)tmpmipmap.width * 4Ui64);
 		squish::DecompressImage(tempRGBA.data.data(), tmpmipmap.width, tmpmipmap.height, tmpmipmap.data, flag);
