@@ -13,7 +13,7 @@ bool __fastcall ispowerof2(unsigned short x)
 
 unsigned short inline next2pow(unsigned short x)
 {
-	x -= 1;
+	x--;
 	x |= x >> 16;
 	x |= x >> 8;
 	x |= x >> 4;
@@ -74,7 +74,7 @@ void ktexlib::Atlas::atlas::xmlgen()
 		rootfilename.set_value(filename.c_str());
 	}
 	auto Elements = Atlas.append_child(L"Elements");
-	for (auto&& bbox : bboxes)
+	for (auto& bbox : bboxes)
 	{
 		float u1 = 0.0, v1 = 0.0, u2 = 0.0, v2 = 0.0;
 		unsigned short w2 = 0, h2 = 0;//texture size

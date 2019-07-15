@@ -183,11 +183,8 @@ __API void ktexlib::KTEXFileOperation::KTEX::Convert()
 		}
 		mipmaps.push_back(temp);
 	}
-	//Info.mipscount = mipmaps.size();
 
 	//生成第一数据块
-	//必要检查
-
 	Header.firstblock = 0xFFF00000;//保留，不排除未来官方会用
 	Header.firstblock |= Info.flags << 18;
 	Header.firstblock |= Info.mipscount << 13;
@@ -212,7 +209,7 @@ __API void ktexlib::KTEXFileOperation::KTEX::Convert()
 	xmlop.xmlgen();
 }
 
-__API void ktexlib::KTEXFileOperation::KTEX::LoadKTEX(std::experimental::filesystem::path filepath)
+__API void ktexlib::KTEXFileOperation::KTEX::LoadKTEX(std::filesystem::path filepath)
 {
 	fstream file(filepath, ios::in | ios::binary);
 	if (!file.is_open())
