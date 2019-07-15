@@ -141,13 +141,13 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="C:\Users\12072\Pictures\私货\1.bmp">
+    <Image Include="私货\1.bmp">
       <Filter>资源文件</Filter>
     </Image>
-    <Image Include="C:\Users\12072\Pictures\私货\2.bmp">
+    <Image Include="私货\2.bmp">
       <Filter>资源文件</Filter>
     </Image>
-    <Image Include="C:\Users\12072\Pictures\私货\3.bmp">
+    <Image Include="私货\3.bmp">
       <Filter>资源文件</Filter>
     </Image>
   </ItemGroup>
