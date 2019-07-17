@@ -79,8 +79,8 @@ void ktexlib::Atlas::atlas::xmlgen()
 		float u1 = 0.0, v1 = 0.0, u2 = 0.0, v2 = 0.0;
 		unsigned short w2 = 0, h2 = 0;//texture size
 
-		//w2 = next2pow(bbox.w);
-		//h2 = next2pow(bbox.h);
+		w2 = next2pow(bbox.w);
+		h2 = next2pow(bbox.h);
 		
 		float boffset[2] = { 0.5f / w2,0.5f / h2 };//border offset
 

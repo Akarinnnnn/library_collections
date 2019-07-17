@@ -143,11 +143,7 @@ __API void ktexlib::KTEXFileOperation::KTEX::Convert()
 				auto curline = (unsigned int*)p_imgvec + ((size_t)y * (size_t)img.width);
 				auto tgtline = (unsigned int*)p_imgvec + (((size_t)img.height - (size_t)y - (size_t)1Ui16) * (size_t)img.width);
 				for (unsigned short x = 0; x < img.width; x++)
-				{
-					unsigned int temp = *(tgtline + x);
-					*(tgtline + x) = *(curline + x);
-					*(curline + x) = temp;
-				}
+					std::swap<unsigned int>(*(tgtline + x), *(curline + x));
 			}
 		}
 
