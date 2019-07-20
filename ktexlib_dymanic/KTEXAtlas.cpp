@@ -1,5 +1,6 @@
 #include "KTEXAtlas.h"
 #include <pugiconfig.hpp>
+#include <charconv>
 #include <pugixml.hpp>//vcpkg了解一下？
 #include <algorithm>
 using namespace std;
@@ -13,6 +14,8 @@ bool __fastcall ispowerof2(unsigned short x)
 
 unsigned short inline next2pow(unsigned short x)
 {
+	if (ispowerof2(x))
+		return x;
 	x--;
 	x |= x >> 16;
 	x |= x >> 8;
@@ -74,24 +77,28 @@ void ktexlib::Atlas::atlas::xmlgen()
 		rootfilename.set_value(filename.c_str());
 	}
 	auto Elements = Atlas.append_child(L"Elements");
+	unsigned short i = 0;
 	for (auto& bbox : bboxes)
 	{
-		float u1 = 0.0, v1 = 0.0, u2 = 0.0, v2 = 0.0;
+		double u1 = 0.0, v1 = 0.0, u2 = 0.0, v2 = 0.0;
 		unsigned short w2 = 0, h2 = 0;//texture size
+		wchar_t index[5]{ 0 };
+		to_chars((char*)index, (char*)index + 3, i, 16);
 
 		w2 = next2pow(bbox.w);
 		h2 = next2pow(bbox.h);
 		
-		float boffset[2] = { 0.5f / w2,0.5f / h2 };//border offset
+		double boffset[2] = { 0.5f / w2,0.5f / h2 };//border offset
 
-		u1 = clamp<float>((bbox.x / w2) + boffset[0], 0.0f, 1.0f);
-		u2 = clamp<float>(1.0f - bbox.x + bbox.w / w2 - boffset[0], 0.0f, 1.0f);
+		u1 = clamp<double>((bbox.x / w2) + boffset[0], 0.0f, 1.0f);
+		u2 = clamp<double>(1.0f - bbox.x + bbox.w / w2 - boffset[0], 0.0f, 1.0f);
 
-		v1 = clamp<float>(bbox.y / h2 + boffset[1], 0.0f, 1.0f);
-		v2 = clamp<float>(1.0f - bbox.y + bbox.h / h2 - boffset[1], 0.0f, 1.0f);
+		v1 = clamp<double>(bbox.y / h2 + boffset[1], 0.0f, 1.0f);
+		v2 = clamp<double>(1.0f - bbox.y + bbox.h / h2 - boffset[1], 0.0f, 1.0f);
+
 
 		auto Element = Elements.append_child(L"Element");
-		Element.append_attribute(L"name").set_value(filename.c_str());
+		Element.append_attribute(L"name").set_value((filename + L'_' + index).c_str());
 		Element.append_attribute(L"u1").set_value(u1);
 		Element.append_attribute(L"v1").set_value(v1);
 		Element.append_attribute(L"u2").set_value(u2);
