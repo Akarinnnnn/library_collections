@@ -1,3 +1,6 @@
+/***************************
+* Encoding: GB2312
+***************************/
 #pragma once
 #include "ktexcommon.h"
 namespace ktexlib

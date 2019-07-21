@@ -1,3 +1,6 @@
+/***************************
+* Encoding: GB2312
+***************************/
 #include "lodepng.h"
 #include "./squish/squish.h"
 #include "TEXFileOperation.h"

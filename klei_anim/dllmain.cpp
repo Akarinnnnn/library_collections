@@ -1,4 +1,7 @@
-﻿// dllmain.cpp : 定义 DLL 应用程序的入口点。
+/***************************
+* Encoding: GB2312
+***************************/
+// dllmain.cpp : ���� DLL Ӧ�ó������ڵ㡣
 #include "pch.h"
 
 BOOL APIENTRY DllMain( HMODULE hModule,

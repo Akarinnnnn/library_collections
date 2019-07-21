@@ -4,6 +4,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 //#include <type_traits>
 //assert size
 static_assert(sizeof(unsigned int) == 4);
@@ -81,12 +82,18 @@ namespace KleiAnim
 
 			/// <summary>元素数量</summary>
 			unsigned int elem_count = 0;
+
 			/// <summary>帧数量</summary>
 			unsigned int frame_count = 0;
+
 			/// <summary>事件数量</summary>
 			unsigned int event_count = 0;
+
 			/// <summary>animation数量</summary>
 			unsigned int anim_count = 0;
+
+			/// <summary>哈希化字符串表</summary>
+			std::vector<hashed> str_table;
 		};
 
 		/// <summary>
@@ -98,26 +105,59 @@ namespace KleiAnim
 			static constexpr unsigned int valid_cc4 = 0x444C4942;
 			///<summary>当前版本</summary>
 			static constexpr unsigned short cur_version = 0x0006;
+
+			unsigned int symbol_count;
+			unsigned int frame_count;
+			u8string name;
+
+
 		};
 
-		/// <summary>动画节点</summary>
+		/// <summary>
+		/// 符号节点
+		/// </summary>
+		struct sym_node
+		{
+			unsigned int hash;
+
+		};
+
+		/// <summary>
+		/// 动画节点
+		/// </summary>
 		struct anim_node
 		{
 			u8string name;
 			Facing facing;
-			unsigned int hash;
+			unsigned int root_hash;
 			float frame_rate;
-			unsigned int frame_count;
+
+			std::vector<frame_node> frames;
 		};
 
-		/// <summary>事件节点</summary>
+		/// <summary>
+		/// 画框节点
+		/// </summary>
+		struct frame_node
+		{
+			float x, y, w, h;
+
+			std::vector<event_node> events;//event count + event
+			std::vector<elem_node> elements;//elem count + elems
+		};
+
+		/// <summary>
+		/// 事件节点
+		/// </summary>
 		struct event_node
 		{
 			/// <summary>哈希</summary>
 			unsigned int hash; //??????
 		};
 
-		/// <summary>元素节点</summary>
+		/// <summary>
+		/// 元素节点
+		/// </summary>
 		struct elem_node
 		{
 			/// <summary>哈希</summary>
@@ -128,6 +168,15 @@ namespace KleiAnim
 			float a, b, c, d;
 			float tx, ty;
 			float z;
+		};
+
+		/// <summary>
+		/// 哈希化的字符串
+		/// </summary>
+		struct hashed
+		{
+			unsigned int hash;
+			u8string original;
 		};
 
 		//Aliases

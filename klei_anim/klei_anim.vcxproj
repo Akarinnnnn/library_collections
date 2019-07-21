@@ -157,8 +157,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="anim_common.hpp" />
+    <ClInclude Include="KleiAnim\Binary.hpp" />
+    <ClInclude Include="KleiAnim\Shared\anim_common.hpp" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="KleiAnim\Xml.hpp" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>

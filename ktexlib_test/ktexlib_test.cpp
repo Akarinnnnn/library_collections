@@ -1,4 +1,7 @@
-ï»¿#include "pch.h"
+/***************************
+* Encoding: GB2312
+***************************/
+#include "pch.h"
 #include "CppUnitTest.h"
 #include <filesystem>
 #include <fstream>
@@ -40,7 +43,7 @@ namespace ktexlibtest
 				}
 			};
 			Atlas::atlas xmlop(L".\\atlas_test.xml", img);
-			//map::map_atlas& view_xmlop = *reinterpret_cast<map::map_atlas*>(&xmlop);//æ„Ÿè°¢ç™¾åº¦ï¼Œæ„Ÿè°¢CSDNçƒ­å¿ƒç½‘å‹
+			//map::map_atlas& view_xmlop = *reinterpret_cast<map::map_atlas*>(&xmlop);//¸ĞĞ»°Ù¶È£¬¸ĞĞ»CSDNÈÈĞÄÍøÓÑ
 			xmlop.xmlgen();
 
 			pugi::xml_document actual;

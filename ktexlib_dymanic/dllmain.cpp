@@ -1,4 +1,7 @@
-ï»¿// dllmain.cpp : å®šä¹‰ DLL åº”ç”¨ç¨‹åºçš„å…¥å£ç‚¹ã€‚
+/***************************
+* Encoding: GB2312
+***************************/
+// dllmain.cpp : ¶¨Òå DLL Ó¦ÓÃ³ÌĞòµÄÈë¿Úµã¡£
 #include "stdafx.h"
 HMODULE hinst;
 BOOL APIENTRY DllMain( HMODULE hModule,

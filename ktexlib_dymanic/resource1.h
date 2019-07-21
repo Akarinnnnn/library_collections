@@ -1,3 +1,6 @@
+/***************************
+* Encoding: GB2312
+***************************/
 //{{NO_DEPENDENCIES}}
 // Microsoft Visual C++ 生成的包含文件。
 // 供 ktexlib_dymanic.rc 使用

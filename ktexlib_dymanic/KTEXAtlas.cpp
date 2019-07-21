@@ -1,3 +1,6 @@
+/***************************
+* Encoding: GB2312
+***************************/
 #include "KTEXAtlas.h"
 #include <pugiconfig.hpp>
 #include <charconv>

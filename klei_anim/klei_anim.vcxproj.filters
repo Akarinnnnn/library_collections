@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="头文件\KleiAnim">
+      <UniqueIdentifier>{a20ab80a-bbe8-4b4d-8a63-9c8c3d9fb9d2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\KleiAnim\Shared">
+      <UniqueIdentifier>{0d1c72a2-3f8d-4e92-8a65-c5c2b6db22ca}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -21,8 +27,14 @@
     <ClInclude Include="pch.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="anim_common.hpp">
-      <Filter>头文件</Filter>
+    <ClInclude Include="KleiAnim\Shared\anim_common.hpp">
+      <Filter>头文件\KleiAnim\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="KleiAnim\Binary.hpp">
+      <Filter>头文件\KleiAnim</Filter>
+    </ClInclude>
+    <ClInclude Include="KleiAnim\Xml.hpp">
+      <Filter>头文件\KleiAnim</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
