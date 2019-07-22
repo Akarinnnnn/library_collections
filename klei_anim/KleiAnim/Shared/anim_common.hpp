@@ -1,26 +1,29 @@
 /***************************
 * Encoding: GB2312
+* KleiAnim的共用部分，包含结构体定义及共用函数
 ***************************/
 #pragma once
 
 #include <string>
 #include <vector>
+#include <map>
 //#include <type_traits>
 //assert size
 static_assert(sizeof(unsigned int) == 4);
 static_assert(sizeof(unsigned short) == 2);
 
 //assert LE(C++ 20)
-//static_assert(std::endian::native == std::endian:little)
+//static_assert(std::endian::native == std::endian::little)
 
 //static_assert(sizeof(unsigned long long) == 8);
 
 namespace KleiAnim
 {
-	using u8string = std::string;
 	namespace Shared
 	{
-		///<summary>图片朝向</summary>
+		///<summary>
+		///图片朝向
+		///</summary>
 		enum class Facing : unsigned char
 		{
 			/// <summary>右</summary>
@@ -61,95 +64,54 @@ namespace KleiAnim
 		};
 
 		/// <summary>
-		/// 动画用bin头的共用部分
+		/// 动画用bin文件的共用部分
 		/// </summary>
-		struct bin_base
+		struct BinaryFileBase
 		{
-			//member
 			unsigned int cc4 = 0;
 			signed int version = 0;
-		};
-
-		/// <summary>
-		/// anim.bin
-		/// </summary>
-		struct Animation :bin_base
-		{
-			///<summary>合规文件的CC4，ANIM</summary>
-			static constexpr unsigned int valid_cc4 = 0x4D494E41;
-			///<summary>当前版本</summary>
-			static constexpr unsigned short cur_version = 0x0004;
-
-			/// <summary>元素数量</summary>
-			unsigned int elem_count = 0;
-
-			/// <summary>帧数量</summary>
-			unsigned int frame_count = 0;
-
-			/// <summary>事件数量</summary>
-			unsigned int event_count = 0;
-
-			/// <summary>animation数量</summary>
-			unsigned int anim_count = 0;
 
 			/// <summary>哈希化字符串表</summary>
-			std::vector<hashed> str_table;
-		};
-
-		/// <summary>
-		/// build.bin
-		/// </summary>
-		struct Build :bin_base
-		{
-			///<summary>合规文件的CC4，BILD</summary>
-			static constexpr unsigned int valid_cc4 = 0x444C4942;
-			///<summary>当前版本</summary>
-			static constexpr unsigned short cur_version = 0x0006;
-
-			unsigned int symbol_count;
-			unsigned int frame_count;
-			u8string name;
-
-
+			std::map<unsigned int, std::string> str_table;
 		};
 
 		/// <summary>
 		/// 符号节点
 		/// </summary>
-		struct sym_node
+		struct SymbolNode
 		{
 			unsigned int hash;
-
+			std::vector<BuildFrameNode> frames;
 		};
 
 		/// <summary>
 		/// 动画节点
 		/// </summary>
-		struct anim_node
+		struct AnimationNode
 		{
-			u8string name;
+			std::string name;
 			Facing facing;
 			unsigned int root_hash;
 			float frame_rate;
 
-			std::vector<frame_node> frames;
+			std::vector<AnimationFrameNode> frames;
 		};
 
 		/// <summary>
-		/// 画框节点
+		/// Animation中的画框节点
 		/// </summary>
-		struct frame_node
+		struct AnimationFrameNode
 		{
 			float x, y, w, h;
 
-			std::vector<event_node> events;//event count + event
-			std::vector<elem_node> elements;//elem count + elems
+			std::vector<EventNode> events;//event count + event
+			std::vector<ElementNode> elements;//elem count + elems
 		};
 
 		/// <summary>
 		/// 事件节点
 		/// </summary>
-		struct event_node
+		struct EventNode
 		{
 			/// <summary>哈希</summary>
 			unsigned int hash; //??????
@@ -158,7 +120,7 @@ namespace KleiAnim
 		/// <summary>
 		/// 元素节点
 		/// </summary>
-		struct elem_node
+		struct ElementNode
 		{
 			/// <summary>哈希</summary>
 			unsigned int name_hash;
@@ -171,16 +133,36 @@ namespace KleiAnim
 		};
 
 		/// <summary>
-		/// 哈希化的字符串
+		/// Build中的画框节点
 		/// </summary>
-		struct hashed
+		struct BuildFrameNode
 		{
-			unsigned int hash;
-			u8string original;
+			/// <summary>序号</summary>
+			unsigned int sn;
+			/// <summary>间隔</summary>
+			unsigned int duration;
+
+			/// <summary>bbox参数</summary>
+			float x, y, w, h;
+
+
+			unsigned int vert_index;
+
+			unsigned int vert_count;
 		};
 
-		//Aliases
-		using facing = Facing;
-		using char8_t = unsigned char;
+		struct Vertex
+		{
+			float x, y, z, u, v, w;
+		};
+
+		/// <summary>
+		/// 计算字符串的哈希值
+		/// </summary>
+		/// <param name="s">将计算哈希的字符串</param>
+		/// <returns>哈希值</returns>
+		/// <created>Fa鸽,2019/7/22</created>
+		/// <changed>Fa鸽,2019/7/22</changed>
+		unsigned int hash(std::string&& s);
 	}
 }

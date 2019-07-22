@@ -19,6 +19,12 @@
     <Filter Include="头文件\KleiAnim\Shared">
       <UniqueIdentifier>{0d1c72a2-3f8d-4e92-8a65-c5c2b6db22ca}</UniqueIdentifier>
     </Filter>
+    <Filter Include="源文件\KleiAnim">
+      <UniqueIdentifier>{d578b005-1e16-488f-bb97-6a6c216af1a1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\KleiAnim\Shared">
+      <UniqueIdentifier>{e26c82fe-bade-4685-9ac8-c91c1606607b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -27,14 +33,17 @@
     <ClInclude Include="pch.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="KleiAnim\Shared\anim_common.hpp">
-      <Filter>头文件\KleiAnim\Shared</Filter>
-    </ClInclude>
     <ClInclude Include="KleiAnim\Binary.hpp">
       <Filter>头文件\KleiAnim</Filter>
     </ClInclude>
     <ClInclude Include="KleiAnim\Xml.hpp">
       <Filter>头文件\KleiAnim</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Shared\klei_anim\KleiAnim\Shared\anim_common.hpp">
+      <Filter>头文件\KleiAnim\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Shared\klei_anim\KleiAnim\Shared\exceptions.hpp">
+      <Filter>头文件\KleiAnim\Shared</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -43,6 +52,15 @@
     </ClCompile>
     <ClCompile Include="pch.cpp">
       <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="KleiAnim\Shared\anim_common.cpp">
+      <Filter>源文件\KleiAnim\Shared</Filter>
+    </ClCompile>
+    <ClCompile Include="KleiAnim\Binary.cpp">
+      <Filter>源文件\KleiAnim</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Shared\klei_anim\KleiAnim\Shared\exceptions.cpp">
+      <Filter>源文件\KleiAnim\Shared</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

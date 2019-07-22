@@ -160,14 +160,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="D:\Shared\klei_anim\KleiAnim\Shared\anim_common.hpp" />
+    <ClInclude Include="D:\Shared\klei_anim\KleiAnim\Shared\exceptions.hpp" />
     <ClInclude Include="KleiAnim\Binary.hpp" />
-    <ClInclude Include="KleiAnim\Shared\anim_common.hpp" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="KleiAnim\Xml.hpp" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="D:\Shared\klei_anim\KleiAnim\Shared\exceptions.cpp" />
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="KleiAnim\Binary.cpp" />
+    <ClCompile Include="KleiAnim\Shared\anim_common.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

@@ -178,6 +178,9 @@
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\klei_anim\klei_anim.vcxproj">
+      <Project>{859dbf5c-ce25-4db1-9789-5063ca14a0ee}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\ktexlib_dymanic\ktexlib_dymanic.vcxproj">
       <Project>{fc0f5b70-d97a-48e5-b2a3-22301ec90493}</Project>
     </ProjectReference>
