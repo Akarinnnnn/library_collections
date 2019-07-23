@@ -6,20 +6,23 @@
 
 #include <string>
 #include <vector>
+#include <typeinfo>
 #include <map>
+#include "NoConstructAllocator.h"
 //#include <type_traits>
 //assert size
 static_assert(sizeof(unsigned int) == 4);
 static_assert(sizeof(unsigned short) == 2);
 
 //assert LE(C++ 20)
+//确保目标机器是小端机
 //static_assert(std::endian::native == std::endian::little)
 
 //static_assert(sizeof(unsigned long long) == 8);
 
 namespace KleiAnim
 {
-	namespace Shared
+	namespace Common
 	{
 		///<summary>
 		///图片朝向
@@ -75,61 +78,11 @@ namespace KleiAnim
 			std::map<unsigned int, std::string> str_table;
 		};
 
-		/// <summary>
-		/// 符号节点
-		/// </summary>
-		struct SymbolNode
+
+
+		struct Vertex
 		{
-			unsigned int hash;
-			std::vector<BuildFrameNode> frames;
-		};
-
-		/// <summary>
-		/// 动画节点
-		/// </summary>
-		struct AnimationNode
-		{
-			std::string name;
-			Facing facing;
-			unsigned int root_hash;
-			float frame_rate;
-
-			std::vector<AnimationFrameNode> frames;
-		};
-
-		/// <summary>
-		/// Animation中的画框节点
-		/// </summary>
-		struct AnimationFrameNode
-		{
-			float x, y, w, h;
-
-			std::vector<EventNode> events;//event count + event
-			std::vector<ElementNode> elements;//elem count + elems
-		};
-
-		/// <summary>
-		/// 事件节点
-		/// </summary>
-		struct EventNode
-		{
-			/// <summary>哈希</summary>
-			unsigned int hash; //??????
-		};
-
-		/// <summary>
-		/// 元素节点
-		/// </summary>
-		struct ElementNode
-		{
-			/// <summary>哈希</summary>
-			unsigned int name_hash;
-			unsigned int frame;
-			unsigned int layer_hash;
-
-			float a, b, c, d;
-			float tx, ty;
-			float z;
+			float x, y, z, u, v, w;
 		};
 
 		/// <summary>
@@ -151,9 +104,73 @@ namespace KleiAnim
 			unsigned int vert_count;
 		};
 
-		struct Vertex
+		/// <summary>
+		/// 符号节点
+		/// </summary>
+		struct SymbolNode
 		{
-			float x, y, z, u, v, w;
+			unsigned int name_hash;
+			std::vector<BuildFrameNode> frames;
+		};
+
+		/// <summary>
+		/// 事件节点
+		/// </summary>
+		struct EventNode
+		{
+			/// <summary>名称的哈希</summary>
+			unsigned int name_hash;
+
+			operator unsigned int()
+			{
+				return name_hash;
+			}
+
+			EventNode(unsigned int h)
+			{
+				name_hash = h;
+			}
+		};
+
+		/// <summary>
+		/// 元素节点
+		/// </summary>
+		struct ElementNode
+		{
+			/// <summary>哈希</summary>
+			unsigned int name_hash;
+			unsigned int frame;
+			unsigned int layer_hash;
+
+			float u1, u2, v1, v2;
+			float tx, ty;
+			float z;
+		};
+
+
+
+		/// <summary>
+		/// Animation中的画框节点
+		/// </summary>
+		struct AnimationFrameNode
+		{
+			float x, y, w, h;
+
+			std::vector<EventNode> events;//event count + event
+			std::vector<ElementNode> elements;//elem count + elems
+		};
+
+		/// <summary>
+		/// 动画节点
+		/// </summary>
+		struct AnimationNode
+		{
+			std::string name;
+			Facing facing;
+			unsigned int rootsym_hash;
+			float frame_rate;
+
+			std::vector<AnimationFrameNode> frames;
 		};
 
 		/// <summary>

@@ -12,10 +12,15 @@
 
 // 添加要在此处预编译的标头
 #include "framework.h"
-#include "anim_shared.h"
+#include "KleiAnim/common/anim_common.hpp"
+#include "KleiAnim/common/exceptions.hpp"
+
+#ifdef _WIN32
 namespace win_spec
 {
 	HMODULE hmoudle;
 }
+#endif // _WIN32
+
 
 #endif //PCH_H

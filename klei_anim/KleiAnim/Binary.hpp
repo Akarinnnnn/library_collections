@@ -3,14 +3,14 @@
 * 对二进制的动画进行读写
 ***************************/
 #pragma once
-#include "Shared/anim_common.hpp"
+#include "common/anim_common.hpp"
 #include <filesystem>
 #include <fstream>
 namespace KleiAnim
 {
 	namespace Binary
 	{
-		class AnimationBase: protected virtual Shared::BinaryFileBase
+		class AnimationBase: protected virtual Common::BinaryFileBase
 		{
 		protected:
 			///<summary>合规文件的CC4，ANIM</summary>
@@ -18,20 +18,11 @@ namespace KleiAnim
 			///<summary>当前版本</summary>
 			static constexpr unsigned short cur_version = 0x0004;
 
-			/// <summary>元素数量</summary>
-			unsigned int elem_count = 0;
-
-			/// <summary>帧数量</summary>
-			unsigned int frame_count = 0;
-
-			/// <summary>事件数量</summary>
-			unsigned int event_count = 0;
-
-			/// <summary>animation数量</summary>
-			unsigned int anim_count = 0;
+			/// <summary>animation</summary>
+			std::vector<Common::AnimationNode> animations;
 		};
 
-		class BuildBase : protected virtual Shared::BinaryFileBase
+		class BuildBase : protected virtual Common::BinaryFileBase
 		{
 		protected:
 			///<summary>合规文件的CC4，BILD</summary>

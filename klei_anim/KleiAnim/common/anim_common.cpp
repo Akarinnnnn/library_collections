@@ -4,7 +4,7 @@
 using std::string;
 using std::exception;
 
-unsigned int KleiAnim::Shared::hash(std::string&& s)
+unsigned int KleiAnim::Common::hash(std::string&& s)
 {
 	//放弃标准库的哈希函数，因为它返回的是size_t
 	unsigned int hash = 0;

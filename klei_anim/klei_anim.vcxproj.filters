@@ -16,14 +16,17 @@
     <Filter Include="头文件\KleiAnim">
       <UniqueIdentifier>{a20ab80a-bbe8-4b4d-8a63-9c8c3d9fb9d2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="头文件\KleiAnim\Shared">
-      <UniqueIdentifier>{0d1c72a2-3f8d-4e92-8a65-c5c2b6db22ca}</UniqueIdentifier>
-    </Filter>
     <Filter Include="源文件\KleiAnim">
       <UniqueIdentifier>{d578b005-1e16-488f-bb97-6a6c216af1a1}</UniqueIdentifier>
     </Filter>
     <Filter Include="源文件\KleiAnim\Shared">
       <UniqueIdentifier>{e26c82fe-bade-4685-9ac8-c91c1606607b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="资源文件\XML架构文档">
+      <UniqueIdentifier>{7678a581-f17b-4e10-a355-4ba2cdbf137b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\KleiAnim\common">
+      <UniqueIdentifier>{0d1c72a2-3f8d-4e92-8a65-c5c2b6db22ca}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -39,11 +42,11 @@
     <ClInclude Include="KleiAnim\Xml.hpp">
       <Filter>头文件\KleiAnim</Filter>
     </ClInclude>
-    <ClInclude Include="D:\Shared\klei_anim\KleiAnim\Shared\anim_common.hpp">
-      <Filter>头文件\KleiAnim\Shared</Filter>
+    <ClInclude Include="KleiAnim\common\exceptions.hpp">
+      <Filter>头文件\KleiAnim\common</Filter>
     </ClInclude>
-    <ClInclude Include="D:\Shared\klei_anim\KleiAnim\Shared\exceptions.hpp">
-      <Filter>头文件\KleiAnim\Shared</Filter>
+    <ClInclude Include="KleiAnim\common\anim_common.hpp">
+      <Filter>头文件\KleiAnim\common</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -53,14 +56,22 @@
     <ClCompile Include="pch.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="KleiAnim\Shared\anim_common.cpp">
-      <Filter>源文件\KleiAnim\Shared</Filter>
-    </ClCompile>
     <ClCompile Include="KleiAnim\Binary.cpp">
       <Filter>源文件\KleiAnim</Filter>
     </ClCompile>
-    <ClCompile Include="D:\Shared\klei_anim\KleiAnim\Shared\exceptions.cpp">
+    <ClCompile Include="KleiAnim\common\anim_common.cpp">
       <Filter>源文件\KleiAnim\Shared</Filter>
     </ClCompile>
+    <ClCompile Include="KleiAnim\common\exceptions.cpp">
+      <Filter>源文件\KleiAnim\Shared</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Xsd Include="KleiAnim\XML Schema\XmlAnimation.xsd">
+      <Filter>资源文件\XML架构文档</Filter>
+    </Xsd>
+    <Xsd Include="KleiAnim\XML Schema\XmlBuild.xsd">
+      <Filter>资源文件\XML架构文档</Filter>
+    </Xsd>
   </ItemGroup>
 </Project>
