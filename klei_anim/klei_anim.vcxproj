@@ -164,6 +164,7 @@
     <ClInclude Include="framework.h" />
     <ClInclude Include="KleiAnim\common\anim_common.hpp" />
     <ClInclude Include="KleiAnim\common\exceptions.hpp" />
+    <ClInclude Include="KleiAnim\common\export.h" />
     <ClInclude Include="KleiAnim\Xml.hpp" />
     <ClInclude Include="pch.h" />
   </ItemGroup>

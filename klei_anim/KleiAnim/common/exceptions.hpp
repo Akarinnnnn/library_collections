@@ -1,10 +1,11 @@
 #pragma once
 #include <exception>
+#include "export.h"
 namespace KleiAnim
 {
 	namespace Exception
 	{
-		class invalid_file : public std::exception
+		class EXPORT_API invalid_file : public std::exception
 		{
 		public:
 			invalid_file();

@@ -11,15 +11,14 @@
 #define PCH_H
 
 // 添加要在此处预编译的标头
-#include "framework.h"
 #include "KleiAnim/common/anim_common.hpp"
 #include "KleiAnim/common/exceptions.hpp"
 
 #ifdef _WIN32
-namespace win_spec
-{
-	HMODULE hmoudle;
-}
+
+#include "framework.h"
+#else
+#define EXPORT_API
 #endif // _WIN32
 
 

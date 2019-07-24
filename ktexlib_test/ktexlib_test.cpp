@@ -24,7 +24,7 @@ namespace ktexlibtest
 		};
 	}
 
-	TEST_CLASS(ktexlibtest)
+	TEST_CLASS(KTEXLib)
 	{
 	public:
 		

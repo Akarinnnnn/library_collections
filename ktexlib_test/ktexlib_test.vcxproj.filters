@@ -21,6 +21,9 @@
     <ClCompile Include="pch.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="KleiAnimTest.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -29,5 +32,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="x64test.runsettings" />
+    <None Include="res\Element Multi Thread Read Test.Small.bin">
+      <Filter>资源文件</Filter>
+    </None>
   </ItemGroup>
 </Project>

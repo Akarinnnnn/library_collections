@@ -6,24 +6,74 @@
 
 #include <string>
 #include <vector>
-#include <typeinfo>
+//#include <typeinfo>
+#include <fstream>
 #include <map>
-#include "NoConstructAllocator.h"
+#include "export.h"
+#include <sstream>
+#include <functional>
+
+
+#ifndef KLEIANIM_USE_CHARLOG
+#define KleiAnimLog KleiAnim::Common::WideCharLog
+#else
+#define KleiAnimLog KleiAnim::Common::CharLog
+#endif // KLEIANIM_USE_CHLOG
+
+
+
 //#include <type_traits>
 //assert size
-static_assert(sizeof(unsigned int) == 4);
-static_assert(sizeof(unsigned short) == 2);
+static_assert(sizeof(unsigned int) == 4,"unsigned int must be 4 bytes long");
+static_assert(sizeof(unsigned short) == 2,"unsigned short must be 2 bytes long");
+static_assert(sizeof(float) == 4,"float must be 4 bytes long");
+//static_assert(sizeof(KleiAnim::Common::ElementNode) == 40);
+
+//assert align
+static_assert(alignof(unsigned short) == 2,"unsigned short must be 2-byte aligned");
+static_assert(alignof(float) == 4,"float must be 4-byte aligned");
+static_assert(alignof(unsigned int) == 4,"unsigned int must be 4-byte aligned");
+
 
 //assert LE(C++ 20)
 //确保目标机器是小端机
 //static_assert(std::endian::native == std::endian::little)
 
-//static_assert(sizeof(unsigned long long) == 8);
 
 namespace KleiAnim
 {
 	namespace Common
 	{
+
+
+		/// <summary>
+		/// 若要改变KleiAnim的日志输出，只需在调用KleiAnim之前构造一个实例
+		/// </summary>
+		class CharLog
+		{
+		public:
+			CharLog(std::ostream& output);
+			static std::ostream& write();
+		private:
+			inline static CharLog* in_use = nullptr;
+			std::ostream* stream;
+		};
+
+
+		/// <summary>
+		/// 若要改变KleiAnim的日志输出，只需在调用KleiAnim之前构造一个实例
+		/// 正常输出中文需要调用wstream.imbue(locale(chs))
+		/// </summary>
+		class WideCharLog
+		{
+		public:
+			WideCharLog(std::wostream& output);
+			static std::wostream& write();
+		private:
+			inline static WideCharLog* in_use = nullptr;
+			std::wostream* stream;
+		};
+
 		///<summary>
 		///图片朝向
 		///</summary>
@@ -79,7 +129,6 @@ namespace KleiAnim
 		};
 
 
-
 		struct Vertex
 		{
 			float x, y, z, u, v, w;
@@ -116,7 +165,7 @@ namespace KleiAnim
 		/// <summary>
 		/// 事件节点
 		/// </summary>
-		struct EventNode
+		struct EXPORT_API EventNode
 		{
 			/// <summary>名称的哈希</summary>
 			unsigned int name_hash;
@@ -124,6 +173,11 @@ namespace KleiAnim
 			operator unsigned int()
 			{
 				return name_hash;
+			}
+
+			EventNode()
+			{
+				name_hash = 0;
 			}
 
 			EventNode(unsigned int h)
@@ -181,5 +235,23 @@ namespace KleiAnim
 		/// <created>Fa鸽,2019/7/22</created>
 		/// <changed>Fa鸽,2019/7/22</changed>
 		unsigned int hash(std::string&& s);
+
+		/// <summary>
+		/// 读取bin文件中的一条字符串（非哈希化字符串）
+		/// </summary>
+		/// <param name="f">流，必须行进到字符串所在的位置</param>
+		/// <returns>读取出的字符串</returns>
+		/// <created>Fa鸽,2019/7/24</created>
+		/// <changed>Fa鸽,2019/7/24</changed>
+		std::string read_str(std::istream& f);
+
+		/// <summary>
+		/// 读取哈希化的字符串表
+		/// </summary>
+		/// <param name="f">文件流，必须行进到字符串表所在位置</param>
+		/// <returns>字符串表</returns>
+		/// <created>Fa鸽,2019/7/24</created>
+		/// <changed>Fa鸽,2019/7/24</changed>
+		std::map<unsigned int, std::string> read_strhashtable(std::ifstream& f);
 	}
 }

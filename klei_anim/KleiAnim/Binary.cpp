@@ -2,29 +2,73 @@
 #include "Binary.hpp"
 #include "common/exceptions.hpp"
 #include <memory>
+#include <thread>
+#include <combaseapi.h>
+#include <mutex>
+#include <chrono>
+
 using namespace KleiAnim::Binary;
 using namespace KleiAnim;
 using std::unique_ptr;
 using std::string;
 using HashedStringTable = std::map<unsigned int, string>;
+using std::filesystem::path;
 
-#define READ_INTO(x) (char*)&(x) 
+#define READ_INTO(x) (char*)&(x)
 
-string read_str(std::istream& f)
+#ifndef KLEIANIM_USE_CHARLOG
+#define LOG(str) L##str
+#endif // KLEIANIM_USE_CHARLOG
+
+void mt_read_elem(const unsigned int count,
+	std::vector<Common::ElementNode>& out, 
+	const std::filesystem::path & path, 
+	const size_t pos)
 {
-	unsigned int strsize;
-	f.read(READ_INTO(strsize), 4);
-	unique_ptr<char[]> c_name(new char[strsize + 1] {0});
-	f.read(c_name.get(), strsize);
-	return string(c_name.get());
+	using std::thread;
+	using std::ios;
+	std::mutex mtx_fin;
+	std::mutex mtx_out;
+	static const unsigned int t_limit = thread::hardware_concurrency();
+	unsigned int finished = 0;
+	for (unsigned int t_index = 0; t_index < t_limit; t_index++)
+	{
+		thread(
+			[&out, count, pos, path, t_index, &finished, &mtx_fin, &mtx_out] 
+			{
+				thread_local std::ifstream file(path, ios::binary | ios::in);
+				thread_local size_t begin_pos = pos + 40 * (count) * (t_index / t_limit);
+				thread_local size_t end_pos = pos + 40 * (count) * ((t_index + 1) / t_limit);
+				thread_local Common::ElementNode read_out{ 0,0,0,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f };
+
+				file.seekg(begin_pos, ios::beg);
+				//读取
+				for (size_t cur_pos = begin_pos; cur_pos < end_pos; cur_pos += 40)
+				{
+					file.read(READ_INTO(read_out), 40);
+					mtx_out.lock();
+					out.push_back(read_out);
+					mtx_out.unlock();
+				}
+
+				file.close();
+
+				mtx_fin.lock();
+				finished++;
+				mtx_fin.unlock();
+			}
+		).detach();
+	}
+
+	while (finished != t_limit)
+	{
+		using namespace std::chrono;
+		std::this_thread::sleep_for(300ms);
+	}
 }
 
-HashedStringTable read_strhashtable(std::ifstream& file)
-{
-	std::map<unsigned int, string> ret;
-}
-
-AnimationReader::AnimationReader(std::filesystem::path& animpath) : file(animpath)
+AnimationReader::AnimationReader(std::filesystem::path& animpath) : 
+	file(animpath, std::ios::binary | std::ios::in)
 {
 	file.read(READ_INTO(cc4), 6);
 	if (cc4 != valid_cc4 || version != cur_version)
@@ -44,8 +88,14 @@ AnimationReader::AnimationReader(std::filesystem::path& animpath) : file(animpat
 		Common::AnimationNode anim;
 		//第一段
 		{
-			anim.name = read_str(file);
+			anim.name = Common::read_str(file);
 			file.read(READ_INTO(anim.facing), 1);
+
+			if (anim.facing != Common::Facing::alldir)
+			{
+				KleiAnimLog::write() << LOG("警告：这不是一段全朝向的动画，可能会出现一些特殊的文件夹。");
+			}
+
 			file.read(READ_INTO(anim.rootsym_hash), 4);
 			file.read(READ_INTO(anim.frame_rate), sizeof(float));
 		}
@@ -67,22 +117,34 @@ AnimationReader::AnimationReader(std::filesystem::path& animpath) : file(animpat
 				frame.events.resize(event_count);
 				file.read((char*)(frame.events.data()), 4 * event_count);
 
+				file.read(READ_INTO(elem_count), 4);
+				frame.elements.reserve(elem_count);
+
 				anim.frames.push_back(frame);
+				elem_total += elem_count;
+				event_total += event_count;
 			}
 
 			frame_total += frame_count;
-			animations.push_back(anim);
+
 		}
 
-		
+		animations.push_back(anim);
 	}
+
+	str_table = Common::read_strhashtable(file);
 }
 
-BuildReader::BuildReader(std::filesystem::path& buildpath): file(buildpath)
+BuildReader::BuildReader(std::filesystem::path& buildpath) : 
+	file(buildpath, std::ios::binary | std::ios::in)
 {
 	file.read(READ_INTO(cc4), 6);
 	if (cc4 != valid_cc4 || version != cur_version)
 	{
 		throw Exception::invalid_file("应提供正确的build.bin", cc4, version);
 	}
+
+
+
+	str_table = Common::read_strhashtable(file);
 }

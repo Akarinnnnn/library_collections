@@ -4,13 +4,14 @@
 ***************************/
 #pragma once
 #include "common/anim_common.hpp"
+#include "common/export.h"
 #include <filesystem>
 #include <fstream>
 namespace KleiAnim
 {
 	namespace Binary
 	{
-		class AnimationBase: protected virtual Common::BinaryFileBase
+		class EXPORT_API AnimationBase: protected virtual Common::BinaryFileBase
 		{
 		protected:
 			///<summary>合规文件的CC4，ANIM</summary>
@@ -22,7 +23,7 @@ namespace KleiAnim
 			std::vector<Common::AnimationNode> animations;
 		};
 
-		class BuildBase : protected virtual Common::BinaryFileBase
+		class EXPORT_API BuildBase : protected virtual Common::BinaryFileBase
 		{
 		protected:
 			///<summary>合规文件的CC4，BILD</summary>
@@ -39,7 +40,7 @@ namespace KleiAnim
 		/// <summary>
 		/// anim.bin读取
 		/// </summary>
-		class AnimationReader : protected AnimationBase
+		class EXPORT_API AnimationReader : protected AnimationBase
 		{
 		public:
 			AnimationReader() = delete;
@@ -51,7 +52,7 @@ namespace KleiAnim
 		/// <summary>
 		/// build.bin读取
 		/// </summary>
-		class BuildReader :protected BuildBase
+		class EXPORT_API BuildReader :protected BuildBase
 		{
 		public:
 			BuildReader() = delete;

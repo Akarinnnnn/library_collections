@@ -48,6 +48,9 @@
     <ClInclude Include="KleiAnim\common\anim_common.hpp">
       <Filter>头文件\KleiAnim\common</Filter>
     </ClInclude>
+    <ClInclude Include="KleiAnim\common\export.h">
+      <Filter>头文件\KleiAnim\common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
