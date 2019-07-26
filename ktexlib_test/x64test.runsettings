@@ -4,6 +4,6 @@
 		<MaxCpuCount>8</MaxCpuCount>
 		<ResultsDirectory>.\TestResults</ResultsDirectory>
 		<TargetPlatform>x64</TargetPlatform>
-		<TestSessionTimeout>10000</TestSessionTimeout>
+		<TestSessionTimeout>60000</TestSessionTimeout>
 	</RunConfiguration>
 </RunSettings>

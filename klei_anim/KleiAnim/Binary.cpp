@@ -20,9 +20,10 @@ using std::filesystem::path;
 #define LOG(str) L##str
 #endif // KLEIANIM_USE_CHARLOG
 
+//v1，将重构 
 void mt_read_elem(const unsigned int count,
-	std::vector<Common::ElementNode>& out, 
-	const std::filesystem::path & path, 
+	std::vector<::KleiAnim::Common::ElementNode>& out,
+	const std::filesystem::path& path,
 	const size_t pos)
 {
 	using std::thread;
@@ -32,20 +33,21 @@ void mt_read_elem(const unsigned int count,
 	static const unsigned int t_limit = thread::hardware_concurrency();
 	unsigned int finished = 0;
 	for (unsigned int t_index = 0; t_index < t_limit; t_index++)
+		//unsigned int t_index = 0;
 	{
 		thread(
-			[&out, count, pos, path, t_index, &finished, &mtx_fin, &mtx_out] 
+			[&out, count, pos, path, &finished, &mtx_fin, &mtx_out]
+		(unsigned int cur_tid)
 			{
 				thread_local std::ifstream file(path, ios::binary | ios::in);
-				thread_local size_t begin_pos = pos + 40 * (count) * (t_index / t_limit);
-				thread_local size_t end_pos = pos + 40 * (count) * ((t_index + 1) / t_limit);
-				thread_local Common::ElementNode read_out{ 0,0,0,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f };
+				thread_local size_t begin_pos = pos + (40Ui64 * count * cur_tid) / t_limit;
+				::KleiAnim::Common::ElementNode read_out{ 0,0,0,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f };
 
-				file.seekg(begin_pos, ios::beg);
+				file.seekg(begin_pos);
 				//读取
-				for (size_t cur_pos = begin_pos; cur_pos < end_pos; cur_pos += 40)
+				for (size_t i = 0; i < count / t_limit; i++)
 				{
-					file.read(READ_INTO(read_out), 40);
+					file.read((char*)(&read_out), 40);
 					mtx_out.lock();
 					out.push_back(read_out);
 					mtx_out.unlock();
@@ -56,14 +58,14 @@ void mt_read_elem(const unsigned int count,
 				mtx_fin.lock();
 				finished++;
 				mtx_fin.unlock();
-			}
-		).detach();
+			},
+			t_index).detach();
 	}
 
 	while (finished != t_limit)
 	{
 		using namespace std::chrono;
-		std::this_thread::sleep_for(300ms);
+		std::this_thread::sleep_for(100ms);
 	}
 }
 
