@@ -44,8 +44,6 @@ namespace KleiAnim
 {
 	namespace Common
 	{
-
-
 		/// <summary>
 		/// 若要改变KleiAnim的日志输出，只需在调用KleiAnim之前构造一个实例
 		/// </summary>
@@ -58,7 +56,6 @@ namespace KleiAnim
 			inline static CharLog* in_use = nullptr;
 			std::ostream* stream;
 		};
-
 
 		/// <summary>
 		/// 若要改变KleiAnim的日志输出，只需在调用KleiAnim之前构造一个实例
@@ -110,7 +107,7 @@ namespace KleiAnim
 			all45 = upright | upleft | downleft | downright,
 
 			/// <summary>所有朝向</summary>
-			alldir = 0xFF,
+			all = 0xFFUi8,
 
 			/// <summary>这不可能！！</summary>
 			invalid = 0
@@ -128,14 +125,16 @@ namespace KleiAnim
 			std::map<unsigned int, std::string> str_table;
 		};
 
-
+		/// <summary>
+		/// OpenGL顶点
+		/// </summary>
 		struct Vertex
 		{
 			float x, y, z, u, v, w;
 		};
 
 		/// <summary>
-		/// Build中的画框节点
+		/// Build中的帧节点
 		/// </summary>
 		struct BuildFrameNode
 		{
@@ -196,15 +195,13 @@ namespace KleiAnim
 			unsigned int frame;
 			unsigned int layer_hash;
 
-			float u1, u2, v1, v2;
+			float a, b, c, d;
 			float tx, ty;
 			float z;
 		};
 
-
-
 		/// <summary>
-		/// Animation中的画框节点
+		/// Animation中的帧节点
 		/// </summary>
 		struct AnimationFrameNode
 		{
@@ -234,7 +231,7 @@ namespace KleiAnim
 		/// <returns>哈希值</returns>
 		/// <created>Fa鸽,2019/7/22</created>
 		/// <changed>Fa鸽,2019/7/22</changed>
-		unsigned int hash(std::string&& s);
+		unsigned int EXPORT_API hash(std::string&& s);
 
 		/// <summary>
 		/// 读取bin文件中的一条字符串（非哈希化字符串）
@@ -253,5 +250,25 @@ namespace KleiAnim
 		/// <created>Fa鸽,2019/7/24</created>
 		/// <changed>Fa鸽,2019/7/24</changed>
 		std::map<unsigned int, std::string> read_strhashtable(std::ifstream& f);
+
+		/// <summary>
+		/// 获取元素节点的字符串(<see cref="std::wstring"/>)表示，仅支持wstring
+		/// </summary>
+		/// <param name="elem">元素节点</param>
+		/// <returns>返回<see cref="std::wstring"/>，建议配合std::move使用以避免构造开销</returns>
+		/// <example><c>wstring elem_str = std::move(ToString(elem));</c></example>
+		/// <created>Fa鸽,2019/7/27</created>
+		/// <changed>Fa鸽,2019/7/27</changed>
+		std::wstring EXPORT_API ToString(const ElementNode& elem);
+
+		/// <summary>
+		/// 比较两个ElementNode是否相等
+		/// </summary>
+		/// <param name="l">1</param>
+		/// <param name="r">2</param>
+		/// <returns>相等返回true，不相等返回false</returns>
+		/// <created>Fa鸽,2019/7/27</created>
+		/// <changed>Fa鸽,2019/7/27</changed>
+		bool EXPORT_API operator==(const ElementNode& l, const ElementNode& r);
 	}
 }

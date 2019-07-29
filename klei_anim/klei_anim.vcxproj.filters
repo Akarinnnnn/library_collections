@@ -70,11 +70,11 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Xsd Include="KleiAnim\XML Schema\XmlAnimation.xsd">
-      <Filter>资源文件\XML架构文档</Filter>
-    </Xsd>
-    <Xsd Include="KleiAnim\XML Schema\XmlBuild.xsd">
-      <Filter>资源文件\XML架构文档</Filter>
-    </Xsd>
+    <None Include="KleiAnim\XML Schema\XmlAnimation.xsd">
+      <Filter>头文件</Filter>
+    </None>
+    <None Include="KleiAnim\XML Schema\XmlBuild.xsd">
+      <Filter>头文件</Filter>
+    </None>
   </ItemGroup>
 </Project>

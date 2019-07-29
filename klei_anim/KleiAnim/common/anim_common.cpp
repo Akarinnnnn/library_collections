@@ -10,13 +10,11 @@ using std::exception;
 
 unsigned int KleiAnim::Common::hash(std::string&& s)
 {
-	//放弃标准库的哈希函数，因为它返回的是size_t
 	unsigned int hash = 0;
 	for (const char v : s)
 	{
 		hash = (v + (hash << 6) + (hash << 16) - hash) & 0xFFFFFFFFU;
 	}
-
 	return hash;
 }
 
@@ -37,8 +35,8 @@ std::map<unsigned int,string> KleiAnim::Common::read_strhashtable(std::ifstream&
 	while (!file.eof())
 	{
 		unsigned int size = 0, hash = 0;
-		file.read(READ_INTO(size), 8);
-
+		file.read(READ_INTO(size), 4);//这里MSVC debug x64的对齐策略导致size和hash不连续
+		file.read(READ_INTO(hash), 4);
 		string str(size, '\0');
 		file.read(str.data(), size);
 
@@ -46,6 +44,34 @@ std::map<unsigned int,string> KleiAnim::Common::read_strhashtable(std::ifstream&
 	}
 	return ret;
 }
+
+std::wstring KleiAnim::Common::ToString(const ElementNode& elem)
+{
+	std::wostringstream _s;
+	_s << L"Name Hash = " << elem.name_hash << '\n'
+		<< L"frame = " << elem.frame << '\n'
+		<< L"uv bounds: " << elem.a << ' ' << elem.b << ' ' << elem.c << ' ' << elem.d << '\n'
+		<< L"tx ty: " << elem.tx << ' ' << elem.ty
+		<< L"Z index = " << elem.z;
+	return _s.str();
+}
+
+bool KleiAnim::Common::operator==(const ElementNode& l, const ElementNode& r)
+{
+	using namespace KleiAnim::Common;
+#ifdef _AMD64_
+	//这么大一个寄存器不用白不用
+	for (unsigned char i = 0; i < 5; i++)
+		if (reinterpret_cast<unsigned long long*>(const_cast<ElementNode*>(&l))[i] != reinterpret_cast<unsigned long long*>(const_cast<ElementNode*>(&r))[i])
+			return false;
+#elif _X86_
+	for (unsigned char i = 0; i < 10; i++)
+		if (reinterpret_cast<unsigned int*>(const_cast<ElementNode*>(&l))[i] != reinterpret_cast<unsigned int*>(const_cast<ElementNode*>(&r))[i])
+			return false;
+#endif
+	return true;
+}
+
 
 KleiAnim::Common::CharLog::CharLog(std::ostream& output)
 {

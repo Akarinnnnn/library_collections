@@ -2,19 +2,95 @@
 * Encoding: GB2312
 ***************************/
 #include "pch.h"
-#include "CppUnitTest.h"
+
 
 #include "../klei_anim/KleiAnim/common/anim_common.hpp"
+#include "../klei_anim/KleiAnim/Binary.hpp"
+#include "../klei_anim/KleiAnim/common/exceptions.hpp"
 #include <filesystem>
 #include <fstream>
 #include <vector>
 #include <thread>
 #include <mutex>
 #include <charconv>
+#include <chrono>
+
+#include "CppUnitTest.h"
+#include <Windows.h>
+
 static_assert(sizeof(unsigned long long) == 8);
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
+using std::ios;
 
-namespace ktexlib_test
+
+
+
+template <>
+std::wstring
+Microsoft::VisualStudio::CppUnitTestFramework::ToString
+	<KleiAnim::Common::ElementNode>
+	(const KleiAnim::Common::ElementNode& elem)
+{
+	std::wostringstream _s;
+	_s << L"Name Hash = " << elem.name_hash << '\n'
+		<< L"frame = " << elem.frame << '\n'
+		<< L"a b c d: " << elem.a << ' ' << elem.b << ' ' << elem.c << ' ' << elem.d << '\n'
+		<< L"tx ty: " << elem.tx << ' ' << elem.ty
+		<< L"Z index = " << elem.z;
+	return _s.str();
+}
+
+template<> std::wstring Microsoft::VisualStudio::CppUnitTestFramework::ToString<KleiAnim::Common::Facing>
+(const KleiAnim::Common::Facing& f)
+{
+	using facing = KleiAnim::Common::Facing;
+	std::wostringstream _s;
+	switch (f)
+	{
+	case facing::all:
+		_s << L"all dir";
+		break;
+	case facing::all45:
+		_s << L"all 45";
+		break;
+	case facing::all90:
+		_s << L"all 90";
+		break;
+	case facing::down:
+		_s << "down";
+		break;
+	case facing::downleft:
+		_s << L"down left";
+		break;
+	case facing::downright:
+		_s << L"down right";
+		break;
+	case facing::left:
+		_s << L"left";
+		break;
+	case facing::right:
+		_s << L"right";
+		break;
+	case facing::up:
+		_s << L"up";
+		break;
+	case facing::upleft:
+		_s << L"up left";
+		break;
+	case facing::upright:
+		_s << L"up right";
+		break;
+	case facing::invalid:
+		_s << L"invalid direction(0x00)";
+		break;
+	default:
+		_s << L"unknown direction, check stacktrace.";
+		break;
+	}
+	return _s.str();
+}
+
+namespace ktexlibtest
 {
 	namespace CompareUnion
 	{
@@ -25,18 +101,49 @@ namespace ktexlib_test
 		};
 	}
 
-	bool operator==(KleiAnim::Common::ElementNode& l, KleiAnim::Common::ElementNode& r)
+	namespace map
 	{
-		for (unsigned char i = 0; i < 5; i++)
-			if (reinterpret_cast<unsigned long long*>(&l)[i] != reinterpret_cast<unsigned long long*>(&r)[i]) 
-				return false;
-
-		return true;
+		struct anim_bin_reader : public KleiAnim::Common::BinaryFileBase
+		{
+			std::vector<KleiAnim::Common::AnimationNode> animations;
+		};
 	}
 
 	TEST_CLASS(KleiAnimTest)
 	{
 	public:
+		TEST_METHOD(SingleThreadElementRead)
+		{
+			using namespace KleiAnim::Common;
+			const ElementNode excepted[]
+			{
+				{ 1,1,10000,0.1f,0.2f,0.3f,0.4f,0.5f,0.6f,0.7f },
+				{ 2,1,10000,0.1f,0.2f,0.3f,0.4f,0.5f,0.6f,0.7f },
+				{ 3,1,10000,0.1f,0.2f,0.3f,0.4f,0.5f,0.6f,0.7f },
+				{ 4,1,10000,0.1f,0.2f,0.3f,0.4f,0.5f,0.6f,0.7f },
+				{ 5,1,10000,1.1f,1.2f,1.3f,1.4f,1.5f,1.6f,1.7f },
+				{ 6,1,10000,1.1f,1.2f,1.3f,1.4f,1.5f,1.6f,1.7f },
+				{ 7,1,10000,1.1f,1.2f,1.3f,1.4f,1.5f,1.6f,1.7f },
+				{ 8,1,10000,1.1f,1.2f,1.3f,1.4f,1.5f,1.6f,1.7f },
+				{ 9,1,10000,2.1f,2.2f,2.3f,2.4f,2.5f,2.6f,2.7f },
+				{ 10,1,10000,2.1f,2.2f,2.3f,2.4f,2.5f,2.6f,2.7f },
+				{ 11,1,10000,2.1f,2.2f,2.3f,2.4f,2.5f,2.6f,2.7f },
+				{ 12,1,10000,2.1f,2.2f,2.3f,2.4f,2.5f,2.6f,2.7f },
+				{ 13,1,10000,3.1f,3.2f,3.3f,3.4f,3.5f,3.6f,3.7f },
+				{ 14,1,10000,3.1f,3.2f,3.3f,3.4f,3.5f,3.6f,3.7f },
+				{ 15,1,10000,3.1f,3.2f,3.3f,3.4f,3.5f,3.6f,3.7f },
+				{ 16,1,10000,3.1f,3.2f,3.3f,3.4f,3.5f,3.6f,3.7f },
+				{ 17,1,10000,4.1f,4.2f,4.3f,4.4f,4.5f,4.6f,4.7f },
+				{ 18,1,10000,4.1f,4.2f,4.3f,4.4f,4.5f,4.6f,4.7f },
+				{ 19,1,10000,4.1f,4.2f,4.3f,4.4f,4.5f,4.6f,4.7f },
+				{ 20,1,10000,4.1f,4.2f,4.3f,4.4f,4.5f,4.6f,4.7f },
+			};
+			std::vector<ElementNode> actual = st_read_elem(std::ifstream("./elem_mtread.fakebin", ios::binary | ios::in), 20);
+			for (size_t i = 0; i < 20; i++)
+			{
+				Assert::IsTrue(excepted[i] == actual[i], (L"NE,i = " + ToString(i)).c_str());
+			}
+		}
 
 		TEST_METHOD(MultiThreadElementRead)
 		{
@@ -76,15 +183,67 @@ namespace ktexlib_test
 			mt_read_elem(20, actual, "./elem_mtread.fakebin", 0);
 
 			Assert::AreEqual(20Ui64,actual.size(),L"Size not match");
+		}
 
-			std::sort(actual.begin(), actual.end(), [](const ElementNode& l,const ElementNode& r) -> bool
-				{
-					return l.name_hash < r.name_hash;
-				});
+		TEST_METHOD(BinAnimRead)
+		{
+			using namespace KleiAnim;
+			using std::filesystem::path;
 
-			for (size_t i = 0; i < 20Ui64; i++)
+			Assert::ExpectException<std::system_error>([] {Binary::AnimationReader(",\\anim_test.bin"); });
+
+			try
 			{
-				Assert::IsTrue(excepted[i] == actual[i], L"Still not match after sorted");
+				auto before_create = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+				Binary::AnimationReader test_reader(path(L".\\anim_test.bin"));
+				auto after_create = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+				Microsoft::VisualStudio::CppUnitTestFramework::Logger::WriteMessage((L"构造用时 " + ToString(after_create - before_create) + L"ns").c_str());
+				//auto test_view = reinterpret_cast<map::anim_bin_reader*>(&test_reader);
+				Assert::AreEqual<size_t>(1, test_reader.anim_count(), L"anim size != 1");
+				const auto& anim0 = test_reader[0];
+
+				Assert::AreEqual(anim0.facing, Common::Facing::all, L"facing != facing::all");
+
+				Assert::AreEqual(anim0.name.c_str(), "idle", false, L"anim name != idle");
+
+				Assert::AreEqual(size_t(40), anim0.frames.size(), L"frame size not match");
+
+				for (const Common::AnimationFrameNode& frame : anim0.frames)
+				{
+					Assert::AreEqual(-142.293198f, frame.x, L"x not match");
+					Assert::AreEqual(-18.273909f, frame.y, L"y not match");
+					Assert::AreEqual(164.0f, frame.w, L"w not match");
+					Assert::AreEqual(177.f, frame.h, L"h not match");
+
+					Assert::AreEqual(size_t(0), frame.events.size(), L"has event?!");
+					Assert::AreEqual(size_t(1), frame.elements.size(), L"elements size != 1");
+
+					const auto& elem = frame.elements[0];
+					Assert::AreEqual(0xA2984AF8U, elem.name_hash, L"name hash != 0xA2984AF8");
+					Assert::AreEqual(0x7B212688U, elem.layer_hash, L"layer hash != 0x7B212688");
+					Assert::AreEqual(0U, elem.frame, L"frame != 0");
+					Assert::AreEqual(-5.0f, elem.z, L"Z != -5");
+
+					Assert::AreEqual(0.0f, elem.a, L"u1 != 0.0");
+					Assert::AreEqual(2.122715f, elem.b, L"u2 != 2.122715");
+					Assert::AreEqual(-2.122715f, elem.c, L"v2 != 2.991668");
+					Assert::AreEqual(0.0f, elem.d, L"v1 != 0.0");
+
+					Assert::AreEqual(2.991668f, elem.tx, L"tx != 2.991668");
+					Assert::AreEqual(-2.869065f, elem.ty, L"ty != -2.869065");
+				}
+			}
+			catch (const std::invalid_argument& e)
+			{
+				wchar_t w_msg[100]= L"invalid_argument异常:";
+				MultiByteToWideChar(936U, 0, e.what(), -1, w_msg + 20, 80);
+				Assert::Fail(w_msg);
+			}
+			catch (const KleiAnim::Exception::invalid_file& e)
+			{
+				wchar_t w_msg[100]=L"invalid_file异常:";
+				MultiByteToWideChar(936U, 0, e.what(), -1, w_msg + 16, 84);
+				Assert::Fail(w_msg);
 			}
 		}
 	private:
@@ -142,8 +301,17 @@ namespace ktexlib_test
 			while (finished != t_limit)
 			{
 				using namespace std::chrono;
-				std::this_thread::sleep_for(100ms);
+				std::this_thread::sleep_for(1ms);
 			}
+		}
+
+		std::vector<KleiAnim::Common::ElementNode> st_read_elem(std::ifstream& f, unsigned int count)
+		{
+			using KleiAnim::Common::ElementNode;
+			std::vector<ElementNode> ret;
+			ret.resize(count);
+			f.read((char*)ret.data(), static_cast<size_t>(count) * 40Ui64);
+			return ret;
 		}
 	};
 }

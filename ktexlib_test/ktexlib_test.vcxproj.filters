@@ -32,8 +32,13 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="x64test.runsettings" />
-    <None Include="res\Element Multi Thread Read Test.Small.bin">
+  </ItemGroup>
+  <ItemGroup>
+    <CopyFileToFolders Include="res\elem_mtread.fakebin">
       <Filter>资源文件</Filter>
-    </None>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="res\anim_test.bin">
+      <Filter>资源文件</Filter>
+    </CopyFileToFolders>
   </ItemGroup>
 </Project>
