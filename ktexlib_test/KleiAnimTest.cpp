@@ -249,7 +249,33 @@ namespace ktexlibtest
 
 		TEST_METHOD(BinBuildRead)
 		{
+			using namespace KleiAnim;
+			Binary::BuildReader test_reader("./build_test.bin");
 
+			Assert::AreEqual("nato556", test_reader.name().c_str(), L"name");
+			Assert::AreEqual(1u, test_reader.get_atlas_count(), L"atlas size != 1");
+			Assert::AreEqual(1u, test_reader.get_symbol_count(), L"symbol count != 1");
+			Assert::AreEqual(6u, test_reader.get_vertex_count(), L"vertex count != 6");
+
+			Assert::AreEqual("atlas-0.tex", test_reader.atlas(0).name.c_str(), "atlas-0 name != atlas-0.tex");
+
+			const auto& sym0 = test_reader[0];
+			Assert::AreEqual(size_t(1), sym0.frames.size(), L"frame size != 1");
+
+			auto& frame0 = sym0.frames[0];
+
+			Assert::AreEqual(0u, frame0.frame_number, L"frame number != 0");
+			Assert::AreEqual(1u, frame0.duration, L"duration != 1");
+
+			Assert::AreEqual(-0.190720f, frame0.x, L"x != -0.190720");
+			Assert::AreEqual(-2.152384f, frame0.y, L"y != -2.152384");
+			Assert::AreEqual(64.0f, frame0.w, L"w != 64.0");
+			Assert::AreEqual(64.0f, frame0.h, L"h != 64.0");
+
+			Assert::AreEqual(6u, frame0.alpha_count, L"alpha count != 6");
+			Assert::AreEqual(0u, frame0.alpha_index, L"alpha index != 0");
+
+			//todo:vertices assert
 		}
 	private:
 

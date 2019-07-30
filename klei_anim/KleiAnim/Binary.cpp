@@ -112,7 +112,7 @@ AnimationReader::AnimationReader(const std::filesystem::path & animpath) :
 		throw Exception::invalid_file("anim.bin不正确", cc4, version);
 	}
 
-	alignas(16) struct { unsigned int sym = 0, frame = 0, event = 0, anim = 0; } info;
+	alignas(16) struct { unsigned int elem = 0, frame = 0, event = 0, anim = 0; } info;
 
 	file.read(READ_INTO(info), 16);
 
@@ -125,7 +125,7 @@ AnimationReader::AnimationReader(const std::filesystem::path & animpath) :
 		//第一段
 #ifdef ENABLE_TIME_RECORD
 		cout << "i_anim = " << i_anim << ',';
-		cout << "read name,facing,hashes" << endl;
+		cout << "read build_name,facing,hashes" << endl;
 		PRINT_TIME;
 #endif
 		{
@@ -198,8 +198,16 @@ AnimationReader::AnimationReader(const std::filesystem::path & animpath) :
 		PRINT_TIME;
 #endif 
 	}
-
 	str_table = Common::read_strhashtable(file);
+
+	if (elem_total != info.elem || frame_total != info.frame || event_total != info.event)
+	{
+		KleiAnimLog::write() << LOG("警告：元素数量/帧数量/事件数量与实际不符。\n") <<
+			LOG("类型 预期数量 实际数量\n") <<
+			LOG("元素 ") << info.elem << ' ' << elem_total << endl <<
+			LOG("帧   ") << info.frame << ' ' << frame_total << endl <<
+			LOG("事件 ") << info.event << ' ' << event_total << endl;
+	}
 }
 
 unsigned int KleiAnim::Binary::AnimationReader::anim_count() const
@@ -237,7 +245,7 @@ const std::vector<Common::ElementNode>& KleiAnim::Binary::AnimationReader::eleme
 	return animations[anim].frames[frame].elements;
 }
 
-BuildReader::BuildReader(std::filesystem::path& buildpath) : 
+BuildReader::BuildReader(const std::filesystem::path & buildpath) : 
 	file(buildpath, std::ios::binary | std::ios::in)
 {
 	using std::cout;
@@ -261,42 +269,114 @@ BuildReader::BuildReader(std::filesystem::path& buildpath) :
 	}
 	
 	file.read(READ_INTO(this->symbol_count), 8);
-	name = std::move(Common::read_str(file));
-
+	build_name = std::move(Common::read_str(file));
+	symbols.reserve(symbol_count);
+	//atlas
 	{
 		unsigned int atlas_count = 0;
 		file.read(READ_INTO(atlas_count), 4);
-		if (atlas_count != 0)
+		atlases.reserve(atlas_count);
+		for (unsigned int i = 0; i < atlas_count; i++)
 		{
-			atlases.reserve(atlas_count);
-			for (unsigned int i = 0; i < atlas_count; i++)
-			{
-				atlases.push_back({ Common::read_str(file) });
-			}
+			atlases.push_back({ Common::read_str(file) });
 		}
 	}
 
+	//symbol
+	unsigned int frame_total = 0;
 	{
-		unsigned int sym_count = 0;
-		file.read(READ_INTO(sym_count), 4);
-		symbols.reserve(sym_count);
-		for (unsigned int i = 0; i < sym_count; i++)
+		for (unsigned int i = 0; i < symbol_count; i++)
 		{
 			Common::SymbolNode symbol;
 			Common::BuildFrameNode curframe;
-			unsigned int frame_count = 0;
+			unsigned int cur_frame_count = 0;
 			file.read(READ_INTO(symbol.name_hash), 4);
-			file.read(READ_INTO(frame_count), 4);
+			file.read(READ_INTO(cur_frame_count), 4);
 
-			for (unsigned int i = 0; i < frame_count; i++)
+			for (unsigned int i = 0; i < cur_frame_count; i++)
 			{
 				file.read(READ_INTO(curframe), 32);
 				symbol.frames.push_back(std::move(curframe));
 			}
-
+			frame_total += cur_frame_count;
 			symbols.push_back(std::move(symbol));
 		}
 	}
 
+	//alpha vertex
+	{
+		unsigned int vertex_count = 0;
+		Common::AlphaVertexNode avn;
+		file.read(READ_INTO(vertex_count), 4);
+		vertices.reserve(vertex_count);
+		for (unsigned int i = 0; i < vertex_count; i++)
+		{
+			file.read(READ_INTO(avn), 24);
+			vertices.push_back(avn);
+		}
+	}
+
 	str_table = Common::read_strhashtable(file);
+
+	if (frame_total != frame_count)
+	{
+		KleiAnimLog::write() << LOG("警告：帧数量与实际不符。\n") <<
+			LOG("预期数量 实际数量\n") <<
+			frame_count << ' ' << frame_total << endl;
+	}
+}
+
+std::vector<Common::SymbolNode>::const_iterator KleiAnim::Binary::BuildReader::begin() const
+{
+	return symbols.begin();
+}
+
+std::vector<Common::SymbolNode>::const_iterator KleiAnim::Binary::BuildReader::end() const
+{
+	return symbols.end();
+}
+
+unsigned int KleiAnim::Binary::BuildReader::get_symbol_count() const
+{
+	return symbols.size();
+}
+
+unsigned int KleiAnim::Binary::BuildReader::get_atlas_count() const
+{
+	return atlases.size();
+}
+
+unsigned int KleiAnim::Binary::BuildReader::get_vertex_count() const
+{
+	return vertices.size();
+}
+
+std::string KleiAnim::Binary::BuildReader::name() const
+{
+	return build_name;
+}
+
+const Common::SymbolNode& KleiAnim::Binary::BuildReader::symbol(const size_t i) const
+{
+	return symbols.at(i);
+}
+
+const Common::SymbolNode& KleiAnim::Binary::BuildReader::operator[](const size_t i) const
+{
+	return symbols[i];
+}
+
+const Common::AtlasNode& KleiAnim::Binary::BuildReader::atlas(const size_t i) const
+{
+	return atlases.at(i);
+}
+
+const Common::AlphaVertexNode& KleiAnim::Binary::BuildReader::vertex(const size_t i) const
+{
+	return vertices.at(i);
+}
+
+const Common::BuildFrameNode& KleiAnim::Binary::BuildReader::frame(const size_t sym, const size_t i) const
+{
+	return symbols.at(sym).frames.at(i);
 }

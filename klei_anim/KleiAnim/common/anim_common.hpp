@@ -128,7 +128,7 @@ namespace KleiAnim
 		/// <summary>
 		/// OpenGL¶¥µã
 		/// </summary>
-		struct Vertex
+		struct AlphaVertexNode
 		{
 			float x, y, z, u, v, w;
 		};

@@ -33,10 +33,11 @@ namespace KleiAnim
 
 			unsigned int symbol_count;
 			unsigned int frame_count;
-			std::string name;
+			std::string build_name;
 
 			std::vector<Common::AtlasNode> atlases;
 			std::vector<Common::SymbolNode> symbols;
+			std::vector<Common::AlphaVertexNode> vertices;
 		};
 
 		/// <summary>
@@ -118,8 +119,33 @@ namespace KleiAnim
 		{
 		public:
 			BuildReader() = delete;
-			BuildReader(std::filesystem::path& buildpath);
+			BuildReader(const std::filesystem::path & buildpath);
 
+			std::vector<Common::SymbolNode>::const_iterator begin() const;
+			std::vector<Common::SymbolNode>::const_iterator end() const;
+
+			unsigned int get_symbol_count() const;
+			unsigned int get_atlas_count() const;
+			unsigned int get_vertex_count() const;
+
+			std::string name() const;
+
+			/// <summary>
+			/// 
+			/// </summary>
+			/// <param name="i"></param>
+			/// <returns></returns>
+			/// <created>Fa¸ë,2019/7/31</created>
+			/// <changed>Fa¸ë,2019/7/31</changed>
+			const Common::SymbolNode& symbol(const size_t i) const;
+			const Common::SymbolNode& operator[] (const size_t i) const;
+
+			const Common::AtlasNode& atlas(const size_t i) const;
+
+			const Common::AlphaVertexNode& vertex(const size_t i) const;
+
+			const Common::BuildFrameNode& frame(const size_t sym, const size_t i) const;
+			
 		private:
 			std::ifstream file;
 		};

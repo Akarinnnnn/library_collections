@@ -40,5 +40,8 @@
     <CopyFileToFolders Include="res\anim_test.bin">
       <Filter>资源文件</Filter>
     </CopyFileToFolders>
+    <CopyFileToFolders Include="res\build_test.bin">
+      <Filter>资源文件</Filter>
+    </CopyFileToFolders>
   </ItemGroup>
 </Project>
