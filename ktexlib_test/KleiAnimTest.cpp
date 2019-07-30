@@ -57,7 +57,7 @@ template<> std::wstring Microsoft::VisualStudio::CppUnitTestFramework::ToString<
 		_s << L"all 90";
 		break;
 	case facing::down:
-		_s << "down";
+		_s << L"down";
 		break;
 	case facing::downleft:
 		_s << L"down left";
@@ -245,6 +245,11 @@ namespace ktexlibtest
 				MultiByteToWideChar(936U, 0, e.what(), -1, w_msg + 16, 84);
 				Assert::Fail(w_msg);
 			}
+		}
+
+		TEST_METHOD(BinBuildRead)
+		{
+
 		}
 	private:
 

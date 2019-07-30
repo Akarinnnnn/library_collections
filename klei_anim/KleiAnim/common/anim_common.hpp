@@ -50,7 +50,7 @@ namespace KleiAnim
 		class CharLog
 		{
 		public:
-			CharLog(std::ostream& output);
+			EXPORT_API CharLog(std::ostream& output);
 			static std::ostream& write();
 		private:
 			inline static CharLog* in_use = nullptr;
@@ -64,7 +64,7 @@ namespace KleiAnim
 		class WideCharLog
 		{
 		public:
-			WideCharLog(std::wostream& output);
+			EXPORT_API WideCharLog(std::wostream& output);
 			static std::wostream& write();
 		private:
 			inline static WideCharLog* in_use = nullptr;
@@ -138,18 +138,18 @@ namespace KleiAnim
 		/// </summary>
 		struct BuildFrameNode
 		{
-			/// <summary>序号</summary>
-			unsigned int sn;
-			/// <summary>间隔</summary>
+			/// <summary>帧号</summary>
+			unsigned int frame_number;
+
+			/// <summary>持续时间</summary>
 			unsigned int duration;
 
-			/// <summary>bbox参数</summary>
+			/// <summary>bbox xywh参数</summary>
 			float x, y, w, h;
 
 
-			unsigned int vert_index;
-
-			unsigned int vert_count;
+			unsigned int alpha_index;
+			unsigned int alpha_count;
 		};
 
 		/// <summary>
@@ -222,6 +222,14 @@ namespace KleiAnim
 			float frame_rate;
 
 			std::vector<AnimationFrameNode> frames;
+		};
+
+		/// <summary>
+		/// Atlas
+		/// </summary>
+		struct AtlasNode
+		{
+			std::string name;
 		};
 
 		/// <summary>

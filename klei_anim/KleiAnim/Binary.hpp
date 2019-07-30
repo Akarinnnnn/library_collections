@@ -35,8 +35,8 @@ namespace KleiAnim
 			unsigned int frame_count;
 			std::string name;
 
-			unsigned int img_count;
-
+			std::vector<Common::AtlasNode> atlases;
+			std::vector<Common::SymbolNode> symbols;
 		};
 
 		/// <summary>
@@ -48,7 +48,7 @@ namespace KleiAnim
 			AnimationReader() = delete;
 			AnimationReader(const std::filesystem::path & animpath);
 
-			unsigned int anim_count();
+			unsigned int anim_count() const;
 			
 			/// <summary>
 			/// 返回hash对应的字符串，建议结合std::move使用
@@ -58,7 +58,7 @@ namespace KleiAnim
 			/// <returns></returns>
 			/// <created>Fa鸽,2019/7/29</created>
 			/// <changed>Fa鸽,2019/7/29</changed>
-			std::string de_hash(const unsigned int hash);
+			std::string de_hash(const unsigned int hash) const;
 
 			/// <summary>
 			/// 获取i号动画
@@ -67,7 +67,7 @@ namespace KleiAnim
 			/// <returns></returns>
 			/// <created>Fa鸽,2019/7/29</created>
 			/// <changed>Fa鸽,2019/7/29</changed>
-			const Common::AnimationNode& animation(const size_t i);
+			const Common::AnimationNode& animation(const size_t i) const;
 
 			/// <summary>
 			/// 获取i号动画，与animation(size_t i)相同
@@ -76,7 +76,7 @@ namespace KleiAnim
 			/// <returns></returns>
 			/// <created>Fa鸽,2019/7/29</created>
 			/// <changed>Fa鸽,2019/7/29</changed>
-			const Common::AnimationNode& operator[] (const size_t i);
+			const Common::AnimationNode& operator[] (const size_t i) const;
 
 			/// <summary>
 			/// 获取相应动画的第frame帧
@@ -86,7 +86,7 @@ namespace KleiAnim
 			/// <returns></returns>
 			/// <created>Fa鸽,2019/7/29</created>
 			/// <changed>Fa鸽,2019/7/29</changed>
-			const Common::AnimationFrameNode& frame(const size_t anim, const size_t frame);
+			const Common::AnimationFrameNode& frame(const size_t anim, const size_t frame) const;
 		
 			/// <summary>
 			/// 获取anim号动画，第frame帧的事件（一般的动画没有）
@@ -96,7 +96,7 @@ namespace KleiAnim
 			/// <returns></returns>
 			/// <created>Fa鸽,2019/7/29</created>
 			/// <changed>Fa鸽,2019/7/29</changed>
-			const std::vector<Common::EventNode>& events(const size_t anim, const size_t frame);		
+			const std::vector<Common::EventNode>& events(const size_t anim, const size_t frame) const;		
 
 			/// <summary>
 			/// 获取anim号动画，第frame帧的元素引用
@@ -106,7 +106,7 @@ namespace KleiAnim
 			/// <returns></returns>
 			/// <created>Fa鸽,2019/7/29</created>
 			/// <changed>Fa鸽,2019/7/29</changed>
-			const std::vector<Common::ElementNode>& element_refs(const size_t anim, const size_t frame);
+			const std::vector<Common::ElementNode>& element_refs(const size_t anim, const size_t frame) const;
 		private:
 			std::ifstream file;
 		};
