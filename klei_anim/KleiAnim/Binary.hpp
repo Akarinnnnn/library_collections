@@ -7,6 +7,8 @@
 #include "common/export.h"
 #include <filesystem>
 #include <fstream>
+#include <array>
+
 namespace KleiAnim
 {
 	namespace Binary
@@ -124,30 +126,172 @@ namespace KleiAnim
 			std::vector<Common::SymbolNode>::const_iterator begin() const;
 			std::vector<Common::SymbolNode>::const_iterator end() const;
 
-			unsigned int get_symbol_count() const;
-			unsigned int get_atlas_count() const;
-			unsigned int get_vertex_count() const;
+			unsigned int symbol_count() const;
+			unsigned int atlas_count() const;
+			unsigned int vertex_count() const;
 
+			
+			/// <summary>
+			/// 名称
+			/// </summary>
+			/// <returns></returns>
+			/// <created>Fa鸽,2019/8/2</created>
+			/// <changed>Fa鸽,2019/8/2</changed>
 			std::string name() const;
 
 			/// <summary>
-			/// 
+			/// 获取 i 号 符号
 			/// </summary>
 			/// <param name="i"></param>
 			/// <returns></returns>
 			/// <created>Fa鸽,2019/7/31</created>
 			/// <changed>Fa鸽,2019/7/31</changed>
 			const Common::SymbolNode& symbol(const size_t i) const;
+
+			/// <summary>
+			/// 获取 i 号 符号
+			/// </summary>
+			/// <param name="i"></param>
+			/// <returns></returns>
+			/// <created>Fa鸽,2019/8/2</created>
+			/// <changed>Fa鸽,2019/8/2</changed>
 			const Common::SymbolNode& operator[] (const size_t i) const;
 
+			/// <summary>
+			/// 获取 i 号atlas
+			/// </summary>
+			/// <param name="i"></param>
+			/// <returns></returns>
+			/// <created>Fa鸽,2019/8/2</created>
+			/// <changed>Fa鸽,2019/8/2</changed>
 			const Common::AtlasNode& atlas(const size_t i) const;
 
+			/// <summary>
+			/// 获取 i 号顶点三角形
+			/// </summary>
+			/// <param name="i"></param>
+			/// <returns></returns>
+			/// <created>Fa鸽,2019/8/2</created>
+			/// <changed>Fa鸽,2019/8/2</changed>
 			const Common::AlphaVertexNode& vertex(const size_t i) const;
 
+			/// <summary>
+			/// 获取第i组顶点三角形
+			/// </summary>
+			/// <returns>std::array，不是内置数组</returns>
+			/// <example><c>for(auto&amp; vertex: bin.vertices(0))</c></example>
+			/// <param name="start">第i组</param>
+			/// <created>Fa鸽,2019/8/2</created>
+			/// <changed>Fa鸽,2019/8/2</changed>
+			std::array<Common::AlphaVertexNode, 6> vertices(const unsigned int start) const;
+
+			/// <summary>
+			/// 获取sym 符号的 i 帧
+			/// </summary>
+			/// <param name="sym"></param>
+			/// <param name="i"></param>
+			/// <returns></returns>
+			/// <created>Fa鸽,2019/8/2</created>
+			/// <changed>Fa鸽,2019/8/2</changed>
 			const Common::BuildFrameNode& frame(const size_t sym, const size_t i) const;
 			
 		private:
 			std::ifstream file;
+		};
+
+		class EXPORT_API AnimationWriter :AnimationBase
+		{
+		public:
+
+			/// <summary>
+			/// 以指定的输出路径构造AnimationWriter
+			/// </summary>
+			/// <param name="out">输出的路径，含文件名</param>
+			/// <returns></returns>
+			/// <created>Fa鸽,2019/8/2</created>
+			/// <changed>Fa鸽,2019/8/2</changed>
+			AnimationWriter(const std::filesystem::path& out);
+
+			//用于写入到zip
+			AnimationWriter(std::ostream&& output);
+			~AnimationWriter();
+
+			/// <summary>
+			/// 将内容写入到文件
+			/// </summary>
+			/// <created>Fa鸽,2019/8/2</created>
+			/// <changed>Fa鸽,2019/8/2</changed>
+			void writefile();
+
+			/// <summary>
+			/// 添加一段动画
+			/// </summary>
+			/// <param name="anim">待添加的动画</param>
+			/// <created>Fa鸽,2019/8/2</created>
+			/// <changed>Fa鸽,2019/8/2</changed>
+			void add(Common::AnimationNode& anim);
+		private:
+			std::filesystem::path output;
+			std::ostream output;//设计用于向zip写入数据
+		};
+
+		class EXPORT_API BuildWriter : BuildBase
+		{
+		public:
+			/// <summary>
+			/// 以指定的输出路径构造BuildWriter
+			/// </summary>
+			/// <param name="out">输出的路径，含文件名</param>
+			/// <returns></returns>
+			/// <created>Fa鸽,2019/8/2</created>
+			/// <changed>Fa鸽,2019/8/2</changed>
+			BuildWriter(const std::filesystem::path& out);
+
+			//用于写入到zip
+			BuildWriter(std::ostream&& output);
+			~BuildWriter();
+
+			/// <summary>
+			/// 将内容写入到文件
+			/// </summary>
+			/// <created>Fa鸽,2019/8/2</created>
+			/// <changed>Fa鸽,2019/8/2</changed>
+			void writefile() const;
+
+			/// <summary>
+			/// 添加一帧
+			/// </summary>
+			/// <param name="frame"></param>
+			/// <created>Fa鸽,2019/8/2</created>
+			/// <changed>Fa鸽,2019/8/2</changed>
+			void add(Common::SymbolNode& frame);
+
+			/// <summary>
+			/// 添加一个顶点三角形
+			/// </summary>
+			/// <param name="vert"></param>
+			/// <created>Fa鸽,2019/8/2</created>
+			/// <changed>Fa鸽,2019/8/2</changed>
+			void add(Common::AlphaVertexNode& vert);
+
+			/// <summary>
+			/// 添加一个atlas
+			/// </summary>
+			/// <param name="atlas"></param>
+			/// <created>Fa鸽,2019/8/2</created>
+			/// <changed>Fa鸽,2019/8/2</changed>
+			void add(Common::AtlasNode& atlas);
+
+			/// <summary>
+			/// 添加一组（6个）顶点三角形
+			/// </summary>
+			/// <param name="vertices">数组</param>
+			/// <created>Fa鸽,2019/8/2</created>
+			/// <changed>Fa鸽,2019/8/2</changed>
+			void add(const std::array<Common::AlphaVertexNode,6>& vertices);
+		private:
+			std::filesystem::path output;
+			std::ostream output;//设计用于向zip写入数据
 		};
 	}
 }

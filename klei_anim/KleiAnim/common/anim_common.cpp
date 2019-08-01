@@ -87,6 +87,15 @@ std::ostream& KleiAnim::Common::CharLog::write()
 KleiAnim::Common::WideCharLog::WideCharLog(std::wostream& output)
 {
 	stream = &output;
+	try
+	{
+		stream->imbue(std::locale("chs"));//忽略C26444，std::locale有不同的析构逻辑
+	}
+	catch (const std::runtime_error& e)
+	{
+		stream->imbue(std::locale("C"));
+		std::cerr << e.what() << ",imbued \"C\" locale" << std::endl;
+	}
 	in_use ? in_use : in_use = this;
 }
 

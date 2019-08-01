@@ -253,9 +253,9 @@ namespace ktexlibtest
 			Binary::BuildReader test_reader("./build_test.bin");
 
 			Assert::AreEqual("nato556", test_reader.name().c_str(), L"name");
-			Assert::AreEqual(1u, test_reader.get_atlas_count(), L"atlas size != 1");
-			Assert::AreEqual(1u, test_reader.get_symbol_count(), L"symbol count != 1");
-			Assert::AreEqual(6u, test_reader.get_vertex_count(), L"vertex count != 6");
+			Assert::AreEqual(1u, test_reader.atlas_count(), L"atlas size != 1");
+			Assert::AreEqual(1u, test_reader.symbol_count(), L"symbol count != 1");
+			Assert::AreEqual(6u, test_reader.vertex_count(), L"vertex count != 6");
 
 			Assert::AreEqual("atlas-0.tex", test_reader.atlas(0).name.c_str(), "atlas-0 name != atlas-0.tex");
 

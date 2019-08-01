@@ -270,7 +270,7 @@ BuildReader::BuildReader(const std::filesystem::path & buildpath) :
 	
 	file.read(READ_INTO(this->symbol_count), 8);
 	build_name = std::move(Common::read_str(file));
-	symbols.reserve(symbol_count);
+	symbols.reserve(BuildBase::symbol_count);
 	//atlas
 	{
 		unsigned int atlas_count = 0;
@@ -285,7 +285,7 @@ BuildReader::BuildReader(const std::filesystem::path & buildpath) :
 	//symbol
 	unsigned int frame_total = 0;
 	{
-		for (unsigned int i = 0; i < symbol_count; i++)
+		for (unsigned int i = 0; i < BuildBase::symbol_count; i++)
 		{
 			Common::SymbolNode symbol;
 			Common::BuildFrameNode curframe;
@@ -308,11 +308,11 @@ BuildReader::BuildReader(const std::filesystem::path & buildpath) :
 		unsigned int vertex_count = 0;
 		Common::AlphaVertexNode avn;
 		file.read(READ_INTO(vertex_count), 4);
-		vertices.reserve(vertex_count);
+		BuildBase::vertices.reserve(vertex_count);
 		for (unsigned int i = 0; i < vertex_count; i++)
 		{
 			file.read(READ_INTO(avn), 24);
-			vertices.push_back(avn);
+			BuildBase::vertices.push_back(avn);
 		}
 	}
 
@@ -336,19 +336,19 @@ std::vector<Common::SymbolNode>::const_iterator KleiAnim::Binary::BuildReader::e
 	return symbols.end();
 }
 
-unsigned int KleiAnim::Binary::BuildReader::get_symbol_count() const
+unsigned int KleiAnim::Binary::BuildReader::symbol_count() const
 {
 	return symbols.size();
 }
 
-unsigned int KleiAnim::Binary::BuildReader::get_atlas_count() const
+unsigned int KleiAnim::Binary::BuildReader::atlas_count() const
 {
 	return atlases.size();
 }
 
-unsigned int KleiAnim::Binary::BuildReader::get_vertex_count() const
+unsigned int KleiAnim::Binary::BuildReader::vertex_count() const
 {
-	return vertices.size();
+	return BuildBase::vertices.size();
 }
 
 std::string KleiAnim::Binary::BuildReader::name() const
@@ -373,7 +373,20 @@ const Common::AtlasNode& KleiAnim::Binary::BuildReader::atlas(const size_t i) co
 
 const Common::AlphaVertexNode& KleiAnim::Binary::BuildReader::vertex(const size_t i) const
 {
-	return vertices.at(i);
+	return BuildBase::vertices.at(i);
+}
+
+std::array<Common::AlphaVertexNode, 6> KleiAnim::Binary::BuildReader::vertices(const unsigned int start) const
+{
+	if (BuildBase::vertices.size() < (start * 6 + 6))
+		throw std::out_of_range("并没有这么多组");
+
+	std::array<Common::AlphaVertexNode, 6> ret;
+	auto beg = BuildBase::vertices.data() + 6 * start;
+	auto d = ret.data();
+	for (unsigned int i = 0; i < 6; i++)
+		d[i] = beg[i];
+	return ret;
 }
 
 const Common::BuildFrameNode& KleiAnim::Binary::BuildReader::frame(const size_t sym, const size_t i) const

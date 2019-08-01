@@ -59,7 +59,6 @@ namespace KleiAnim
 
 		/// <summary>
 		/// 若要改变KleiAnim的日志输出，只需在调用KleiAnim之前构造一个实例
-		/// 正常输出中文需要调用wstream.imbue(locale(chs))
 		/// </summary>
 		class WideCharLog
 		{
