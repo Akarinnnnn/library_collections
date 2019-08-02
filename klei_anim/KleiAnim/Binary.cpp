@@ -14,6 +14,7 @@ using std::unique_ptr;
 using std::string;
 using HashedStringTable = std::map<unsigned int, string>;
 using std::filesystem::path;
+using std::ios;
 
 #define READ_INTO(x) (char*)&(x)
 
@@ -268,7 +269,7 @@ BuildReader::BuildReader(const std::filesystem::path & buildpath) :
 		throw Exception::invalid_file("应提供正确的build.bin", cc4, version);
 	}
 	
-	file.read(READ_INTO(this->symbol_count), 8);
+	file.read(READ_INTO(BuildBase::symbol_count), 8);
 	build_name = std::move(Common::read_str(file));
 	symbols.reserve(BuildBase::symbol_count);
 	//atlas
@@ -392,4 +393,43 @@ std::array<Common::AlphaVertexNode, 6> KleiAnim::Binary::BuildReader::vertices(c
 const Common::BuildFrameNode& KleiAnim::Binary::BuildReader::frame(const size_t sym, const size_t i) const
 {
 	return symbols.at(sym).frames.at(i);
+}
+
+KleiAnim::Binary::AnimationWriter::AnimationWriter(const std::filesystem::path& out) :output(std::ofstream(out, ios::binary | ios::trunc))
+{
+	
+}
+
+KleiAnim::Binary::AnimationWriter::AnimationWriter(const std::filesystem::path& out, AnimationBase& base):
+	output(std::ofstream(out, ios::binary | ios::trunc)),
+	AnimationBase(base)
+{
+}
+
+KleiAnim::Binary::AnimationWriter::~AnimationWriter()
+{
+	
+}
+
+void KleiAnim::Binary::AnimationWriter::writefile()
+{
+	output.write("ANIM", 4);
+	output.write((char*)(&AnimationBase::cur_version), 4);
+
+
+}
+
+void KleiAnim::Binary::AnimationWriter::add(Common::AnimationNode& anim)
+{
+	animations.push_back(anim);
+}
+
+KleiAnim::Binary::BuildWriter::BuildWriter(const std::filesystem::path& out) :output(std::ofstream(out, ios::binary | ios::trunc))
+{
+	cc4 = valid_cc4;
+	version = cur_version;
+}
+
+KleiAnim::Binary::BuildWriter::~BuildWriter()
+{
 }

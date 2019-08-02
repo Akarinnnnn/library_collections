@@ -216,8 +216,14 @@ namespace KleiAnim
 		struct AnimationNode
 		{
 			std::string name;
+
+			/// <summary>³¯Ïò</summary>
 			Facing facing;
+
+			/// <summary>¸ù·ûºÅ¹þÏ£</summary>
 			unsigned int rootsym_hash;
+
+			/// <summary>Ö¡ÂÊ</summary>
 			float frame_rate;
 
 			std::vector<AnimationFrameNode> frames;

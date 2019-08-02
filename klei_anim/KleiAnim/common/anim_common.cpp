@@ -32,16 +32,29 @@ string KleiAnim::Common::read_str(std::istream& f)
 std::map<unsigned int,string> KleiAnim::Common::read_strhashtable(std::ifstream& file)
 {
 	std::map<unsigned int, string> ret;
-	while (!file.eof())
-	{
-		unsigned int size = 0, hash = 0;
-		file.read(READ_INTO(size), 4);//这里MSVC debug x64的对齐策略导致size和hash不连续
-		file.read(READ_INTO(hash), 4);
-		string str(size, '\0');
-		file.read(str.data(), size);
+	static unsigned int buff_size = 10;
+	unsigned int pair_count = 0, strsize = 0, hash = 0;
+	char* buffier = new char[buff_size] {0};
 
-		ret.insert(std::make_pair(hash, str));
+	file.read(READ_INTO(pair_count), 4);
+
+	for (unsigned int i = 0; i < pair_count; i++)
+	{
+		file.read(READ_INTO(hash), 4);//这里MSVC debug x64的对齐策略导致size和hash不连续
+		file.read(READ_INTO(strsize), 4);
+
+		if (strsize > buff_size)
+		{
+			delete[] buffier;
+			buff_size = strsize;
+			buffier = new char[buff_size];
+		}
+
+		file.read(buffier, strsize);
+
+		ret.insert(std::make_pair(hash, std::string(buffier, buffier + strsize)));
 	}
+	delete[] buffier;
 	return ret;
 }
 
@@ -64,7 +77,7 @@ bool KleiAnim::Common::operator==(const ElementNode& l, const ElementNode& r)
 	for (unsigned char i = 0; i < 5; i++)
 		if (reinterpret_cast<unsigned long long*>(const_cast<ElementNode*>(&l))[i] != reinterpret_cast<unsigned long long*>(const_cast<ElementNode*>(&r))[i])
 			return false;
-#elif _X86_
+#elif defined(_X86_)
 	for (unsigned char i = 0; i < 10; i++)
 		if (reinterpret_cast<unsigned int*>(const_cast<ElementNode*>(&l))[i] != reinterpret_cast<unsigned int*>(const_cast<ElementNode*>(&r))[i])
 			return false;

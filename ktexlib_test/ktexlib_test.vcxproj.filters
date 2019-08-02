@@ -32,6 +32,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="x64test.runsettings" />
+    <None Include="x86test.runsettings" />
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="res\elem_mtread.fakebin">

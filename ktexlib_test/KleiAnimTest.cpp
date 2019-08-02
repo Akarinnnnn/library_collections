@@ -182,7 +182,7 @@ namespace ktexlibtest
 			//std::ifstream fakebin(, std::ios::binary | std::ios::in);
 			mt_read_elem(20, actual, "./elem_mtread.fakebin", 0);
 
-			Assert::AreEqual(20Ui64,actual.size(),L"Size not match");
+			Assert::AreEqual(size_t(20),actual.size(),L"Size not match");
 		}
 
 		TEST_METHOD(BinAnimRead)

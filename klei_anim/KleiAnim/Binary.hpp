@@ -211,9 +211,7 @@ namespace KleiAnim
 			/// <created>Fa鸽,2019/8/2</created>
 			/// <changed>Fa鸽,2019/8/2</changed>
 			AnimationWriter(const std::filesystem::path& out);
-
-			//用于写入到zip
-			AnimationWriter(std::ostream&& output);
+			AnimationWriter(const std::filesystem::path& out, AnimationBase& base);
 			~AnimationWriter();
 
 			/// <summary>
@@ -231,8 +229,7 @@ namespace KleiAnim
 			/// <changed>Fa鸽,2019/8/2</changed>
 			void add(Common::AnimationNode& anim);
 		private:
-			std::filesystem::path output;
-			std::ostream output;//设计用于向zip写入数据
+			std::ofstream output;
 		};
 
 		class EXPORT_API BuildWriter : BuildBase
@@ -246,9 +243,7 @@ namespace KleiAnim
 			/// <created>Fa鸽,2019/8/2</created>
 			/// <changed>Fa鸽,2019/8/2</changed>
 			BuildWriter(const std::filesystem::path& out);
-
-			//用于写入到zip
-			BuildWriter(std::ostream&& output);
+			BuildWriter(BuildBase& base);
 			~BuildWriter();
 
 			/// <summary>
@@ -290,8 +285,7 @@ namespace KleiAnim
 			/// <changed>Fa鸽,2019/8/2</changed>
 			void add(const std::array<Common::AlphaVertexNode,6>& vertices);
 		private:
-			std::filesystem::path output;
-			std::ostream output;//设计用于向zip写入数据
+			std::ofstream output;//设计用于向zip写入数据
 		};
 	}
 }
