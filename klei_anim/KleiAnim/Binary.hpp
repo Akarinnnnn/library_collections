@@ -211,7 +211,7 @@ namespace KleiAnim
 			/// <created>Fa鸽,2019/8/2</created>
 			/// <changed>Fa鸽,2019/8/2</changed>
 			AnimationWriter(const std::filesystem::path& out);
-			AnimationWriter(const std::filesystem::path& out, AnimationBase& base);
+			AnimationWriter(const std::filesystem::path& out, const AnimationBase & base);
 			~AnimationWriter();
 
 			/// <summary>
@@ -243,7 +243,7 @@ namespace KleiAnim
 			/// <created>Fa鸽,2019/8/2</created>
 			/// <changed>Fa鸽,2019/8/2</changed>
 			BuildWriter(const std::filesystem::path& out);
-			BuildWriter(BuildBase& base);
+			BuildWriter(const std::filesystem::path & out, const BuildBase & base);
 			~BuildWriter();
 
 			/// <summary>
@@ -251,15 +251,15 @@ namespace KleiAnim
 			/// </summary>
 			/// <created>Fa鸽,2019/8/2</created>
 			/// <changed>Fa鸽,2019/8/2</changed>
-			void writefile() const;
+			void writefile();
 
 			/// <summary>
-			/// 添加一帧
+			/// 添加一个符号
 			/// </summary>
 			/// <param name="frame"></param>
 			/// <created>Fa鸽,2019/8/2</created>
 			/// <changed>Fa鸽,2019/8/2</changed>
-			void add(Common::SymbolNode& frame);
+			void add(Common::SymbolNode& sym);
 
 			/// <summary>
 			/// 添加一个顶点三角形
@@ -285,7 +285,7 @@ namespace KleiAnim
 			/// <changed>Fa鸽,2019/8/2</changed>
 			void add(const std::array<Common::AlphaVertexNode,6>& vertices);
 		private:
-			std::ofstream file;//设计用于向zip写入数据
+			std::ofstream file;
 		};
 	}
 }

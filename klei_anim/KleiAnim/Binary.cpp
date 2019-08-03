@@ -90,7 +90,7 @@ std::vector<KleiAnim::Common::ElementNode> st_read_elem(std::ifstream& f, unsign
 	return ret;
 }
 
-void write_str(std::string& s, std::ostream& o)
+void write_str(const std::string& s, std::ostream& o)
 {
 	size_t size_ui64 = s.size();
 	if (size_ui64 > UINT32_MAX)
@@ -391,11 +391,11 @@ const Common::AlphaVertexNode& KleiAnim::Binary::BuildReader::vertex(const size_
 
 std::array<Common::AlphaVertexNode, 6> KleiAnim::Binary::BuildReader::vertices(const unsigned int start) const
 {
-	if (BuildBase::vertices.size() < (start * 6 + 6))
+	if (BuildBase::vertices.size() < (size_t(start) * size_t(6) + size_t(6)))
 		throw std::out_of_range("并没有这么多组");
 
 	std::array<Common::AlphaVertexNode, 6> ret;
-	auto beg = BuildBase::vertices.data() + 6 * start;
+	auto beg = BuildBase::vertices.data() + size_t(6) * size_t(start);
 	auto d = ret.data();
 	for (unsigned int i = 0; i < 6; i++)
 		d[i] = beg[i];
@@ -407,17 +407,16 @@ const Common::BuildFrameNode& KleiAnim::Binary::BuildReader::frame(const size_t 
 	return symbols.at(sym).frames.at(i);
 }
 
-KleiAnim::Binary::AnimationWriter::AnimationWriter(const std::filesystem::path& out) :file(std::ofstream(out, ios::binary | ios::trunc))
+KleiAnim::Binary::AnimationWriter::AnimationWriter(const std::filesystem::path& out) :file(out, ios::binary | ios::trunc | ios::out)
 {
 	cc4 = valid_cc4;
 	version = cur_version;
 }
 
-KleiAnim::Binary::AnimationWriter::AnimationWriter(const std::filesystem::path& out, AnimationBase& base):
-	file(std::ofstream(out, ios::binary | ios::trunc)),
+KleiAnim::Binary::AnimationWriter::AnimationWriter(const std::filesystem::path& out, const AnimationBase & base)
+	:file(out, ios::binary | ios::trunc | ios::out),
 	AnimationBase(base)
-{
-}
+{}
 
 KleiAnim::Binary::AnimationWriter::~AnimationWriter()
 {
@@ -427,7 +426,7 @@ KleiAnim::Binary::AnimationWriter::~AnimationWriter()
 void KleiAnim::Binary::AnimationWriter::writefile()
 {
 	file.write("ANIM", 4);
-	file.write((char*)(&AnimationBase::cur_version), 4);
+	file.write(TO_CONST_PCHAR(cur_version), 4);
 
 	unsigned int elem_total = 0, frame_total = 0, event_total = 0, anim_total = animations.size();
 	//elem_total,frame_total,event_total字段写完文件之后再插入
@@ -464,13 +463,18 @@ void KleiAnim::Binary::AnimationWriter::writefile()
 		}
 	}
 	
-	//hashed string table
-	for (auto& pair : str_table)
+	//str table
 	{
-		file.write(TO_CONST_PCHAR(pair.first), 4);
-		unsigned int strsize(pair.second.size());
-		file.write(TO_CONST_PCHAR(strsize), 4);
-		file.write(pair.second.c_str(), pair.second.size());
+		unsigned int table_count(str_table.size());
+		file.write(TO_PCHAR(table_count), 4);
+		for (auto& pair : str_table)
+		{
+			unsigned int strsize(pair.second.size());
+
+			file.write(TO_CONST_PCHAR(pair.first), 4);
+			file.write(TO_CONST_PCHAR(strsize), 4);
+			file.write(pair.second.c_str(), pair.second.size());
+		}
 	}
 
 	//插入之前跳过的字段
@@ -487,13 +491,103 @@ void KleiAnim::Binary::AnimationWriter::add(Common::AnimationNode& anim)
 	animations.push_back(anim);
 }
 
-KleiAnim::Binary::BuildWriter::BuildWriter(const std::filesystem::path& out) :file(std::ofstream(out, ios::binary | ios::trunc))
+KleiAnim::Binary::BuildWriter::BuildWriter(const std::filesystem::path& out) :file(out, ios::binary | ios::trunc | ios::out)
 {
 	cc4 = valid_cc4;
 	version = cur_version;
 }
 
+KleiAnim::Binary::BuildWriter::BuildWriter(const std::filesystem::path& out, const BuildBase& base)
+	:file(out, ios::trunc | ios::binary | ios::out),
+	BuildBase(base)
+{}
+
 KleiAnim::Binary::BuildWriter::~BuildWriter()
 {
 	file.close();
+}
+
+void KleiAnim::Binary::BuildWriter::writefile()
+{
+	file.write("BILD", 4);
+	file.write(TO_CONST_PCHAR(cur_version), 4);
+
+	write_str(build_name, file);
+
+	file.write(TO_PCHAR(BuildBase::symbol_count), 4);
+
+	//atlas
+	{
+		unsigned int atlas_count(atlases.size());
+		file.write(TO_PCHAR(atlas_count), 4);
+		for (auto& atlas : atlases)
+		{
+			write_str(atlas.name, file);
+		}
+	}
+
+	//symbol
+	for (auto& symbol : symbols)
+	{
+		unsigned frame_count(symbol.frames.size());
+		
+		file.write(TO_PCHAR(symbol.name_hash), 4);
+		file.write(TO_PCHAR(frame_count), 4);
+
+		//frame
+		for (auto& frame : symbol.frames)
+		{
+			file.write(TO_PCHAR(frame), 32);
+		}
+	}
+
+	//alpha vertex
+	{
+		unsigned int vertex_count(vertices.size());
+		file.write(TO_PCHAR(vertex_count), 4);
+		for (auto& avn : vertices)
+		{
+			file.write(TO_PCHAR(avn), 24);
+		}
+	}
+
+	//str table
+	{
+		unsigned int table_count(str_table.size());
+		file.write(TO_PCHAR(table_count), 4);
+		for (auto& pair : str_table)
+		{
+			unsigned int strsize(pair.second.size());
+
+			file.write(TO_CONST_PCHAR(pair.first), 4);
+			file.write(TO_CONST_PCHAR(strsize), 4);
+			file.write(pair.second.c_str(), pair.second.size());
+		}
+	}
+}
+
+void KleiAnim::Binary::BuildWriter::add(Common::SymbolNode& sym)
+{
+	BuildBase::symbols.push_back(sym);
+	if (sym.frames.size() >= UINT32_MAX - frame_count)
+		throw std::out_of_range("too much frames");
+	frame_count += sym.frames.size();
+}
+
+void KleiAnim::Binary::BuildWriter::add(Common::AlphaVertexNode& vert)
+{
+	BuildBase::vertices.push_back(vert);
+}
+
+void KleiAnim::Binary::BuildWriter::add(Common::AtlasNode& atlas)
+{
+	BuildBase::atlases.push_back(atlas);
+}
+
+void KleiAnim::Binary::BuildWriter::add(const std::array<Common::AlphaVertexNode, 6> & vertices)
+{
+	for (auto& vert : vertices)
+	{
+		BuildBase::vertices.push_back(vert);
+	}
 }
