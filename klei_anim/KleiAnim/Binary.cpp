@@ -16,7 +16,8 @@ using HashedStringTable = std::map<unsigned int, string>;
 using std::filesystem::path;
 using std::ios;
 
-#define READ_INTO(x) (char*)&(x)
+#define TO_PCHAR(x) reinterpret_cast<char*>(&(x))
+#define TO_CONST_PCHAR(x) reinterpret_cast<const char*>(&(x))
 
 #ifndef KLEIANIM_USE_CHARLOG
 #define LOG(str) L##str
@@ -89,6 +90,17 @@ std::vector<KleiAnim::Common::ElementNode> st_read_elem(std::ifstream& f, unsign
 	return ret;
 }
 
+void write_str(std::string& s, std::ostream& o)
+{
+	size_t size_ui64 = s.size();
+	if (size_ui64 > UINT32_MAX)
+		throw std::invalid_argument("KleiAnim/Binary.cpp " __FUNCTION__ " s:字符串过长");
+	unsigned int size(size_ui64);
+	
+	o.write(TO_PCHAR(size), 4);
+	o.write(s.data(), size);
+}
+
 AnimationReader::AnimationReader(const std::filesystem::path & animpath) : 
 	file(animpath, std::ios::binary | std::ios::in)
 {
@@ -106,7 +118,7 @@ AnimationReader::AnimationReader(const std::filesystem::path & animpath) :
 		throw std::invalid_argument("打开失败");
 	}
 
-	file.read(READ_INTO(cc4), 8);
+	file.read(TO_PCHAR(cc4), 8);
 
 	if (cc4 != valid_cc4 || version != cur_version)
 	{
@@ -115,7 +127,7 @@ AnimationReader::AnimationReader(const std::filesystem::path & animpath) :
 
 	alignas(16) struct { unsigned int elem = 0, frame = 0, event = 0, anim = 0; } info;
 
-	file.read(READ_INTO(info), 16);
+	file.read(TO_PCHAR(info), 16);
 
 	unsigned int elem_total = 0, frame_total = 0, event_total = 0;
 
@@ -131,15 +143,15 @@ AnimationReader::AnimationReader(const std::filesystem::path & animpath) :
 #endif
 		{
 			anim.name = Common::read_str(file);
-			file.read(READ_INTO(anim.facing), 1);
+			file.read(TO_PCHAR(anim.facing), 1);
 
 			if (anim.facing != Common::Facing::all)
 			{
-				KleiAnimLog::write() << LOG("警告：这不是一段全朝向的动画，可能会出现一些特殊的文件夹。");
+				KleiAnimLog::write() << animpath << LOG(" 不是一段全朝向的动画。");
 			}
 
-			file.read(READ_INTO(anim.rootsym_hash), 4);
-			file.read(READ_INTO(anim.frame_rate), sizeof(float));
+			file.read(TO_PCHAR(anim.rootsym_hash), 4);
+			file.read(TO_PCHAR(anim.frame_rate), sizeof(float));
 		}
 #ifdef ENABLE_TIME_RECORD
 		cout << "finished,";
@@ -150,7 +162,7 @@ AnimationReader::AnimationReader(const std::filesystem::path & animpath) :
 		//frame
 		{
 			unsigned int frame_count = 0;
-			file.read(READ_INTO(frame_count), 4);
+			file.read(TO_PCHAR(frame_count), 4);
 			anim.frames.reserve(frame_count);
 
 			for (size_t i = 0; i < frame_count; i++)
@@ -162,14 +174,14 @@ AnimationReader::AnimationReader(const std::filesystem::path & animpath) :
 				Common::AnimationFrameNode frame;
 				unsigned int event_count = 0, elem_count = 0;
 
-				file.read(READ_INTO(frame.x), 4 * sizeof(float));
+				file.read(TO_PCHAR(frame.x), 4 * sizeof(float));
 
-				file.read(READ_INTO(event_count), 4);
+				file.read(TO_PCHAR(event_count), 4);
 
 				frame.events.resize(event_count);
 				file.read((char*)(frame.events.data()), size_t(4) * (size_t)event_count);
 
-				file.read(READ_INTO(elem_count), 4);
+				file.read(TO_PCHAR(elem_count), 4);
 				frame.elements.reserve(elem_count);
 
 				#ifndef MT_READ_ELEM
@@ -263,19 +275,19 @@ BuildReader::BuildReader(const std::filesystem::path & buildpath) :
 		throw std::invalid_argument("打开失败");
 	}
 
-	file.read(READ_INTO(cc4), 8);
+	file.read(TO_PCHAR(cc4), 8);
 	if (cc4 != valid_cc4 || version != cur_version)
 	{
 		throw Exception::invalid_file("应提供正确的build.bin", cc4, version);
 	}
 	
-	file.read(READ_INTO(BuildBase::symbol_count), 8);
+	file.read(TO_PCHAR(BuildBase::symbol_count), 8);
 	build_name = std::move(Common::read_str(file));
 	symbols.reserve(BuildBase::symbol_count);
 	//atlas
 	{
 		unsigned int atlas_count = 0;
-		file.read(READ_INTO(atlas_count), 4);
+		file.read(TO_PCHAR(atlas_count), 4);
 		atlases.reserve(atlas_count);
 		for (unsigned int i = 0; i < atlas_count; i++)
 		{
@@ -291,12 +303,12 @@ BuildReader::BuildReader(const std::filesystem::path & buildpath) :
 			Common::SymbolNode symbol;
 			Common::BuildFrameNode curframe;
 			unsigned int cur_frame_count = 0;
-			file.read(READ_INTO(symbol.name_hash), 4);
-			file.read(READ_INTO(cur_frame_count), 4);
+			file.read(TO_PCHAR(symbol.name_hash), 4);
+			file.read(TO_PCHAR(cur_frame_count), 4);
 
 			for (unsigned int i = 0; i < cur_frame_count; i++)
 			{
-				file.read(READ_INTO(curframe), 32);
+				file.read(TO_PCHAR(curframe), 32);
 				symbol.frames.push_back(std::move(curframe));
 			}
 			frame_total += cur_frame_count;
@@ -308,11 +320,11 @@ BuildReader::BuildReader(const std::filesystem::path & buildpath) :
 	{
 		unsigned int vertex_count = 0;
 		Common::AlphaVertexNode avn;
-		file.read(READ_INTO(vertex_count), 4);
+		file.read(TO_PCHAR(vertex_count), 4);
 		BuildBase::vertices.reserve(vertex_count);
 		for (unsigned int i = 0; i < vertex_count; i++)
 		{
-			file.read(READ_INTO(avn), 24);
+			file.read(TO_PCHAR(avn), 24);
 			BuildBase::vertices.push_back(avn);
 		}
 	}
@@ -395,28 +407,79 @@ const Common::BuildFrameNode& KleiAnim::Binary::BuildReader::frame(const size_t 
 	return symbols.at(sym).frames.at(i);
 }
 
-KleiAnim::Binary::AnimationWriter::AnimationWriter(const std::filesystem::path& out) :output(std::ofstream(out, ios::binary | ios::trunc))
+KleiAnim::Binary::AnimationWriter::AnimationWriter(const std::filesystem::path& out) :file(std::ofstream(out, ios::binary | ios::trunc))
 {
-	
+	cc4 = valid_cc4;
+	version = cur_version;
 }
 
 KleiAnim::Binary::AnimationWriter::AnimationWriter(const std::filesystem::path& out, AnimationBase& base):
-	output(std::ofstream(out, ios::binary | ios::trunc)),
+	file(std::ofstream(out, ios::binary | ios::trunc)),
 	AnimationBase(base)
 {
 }
 
 KleiAnim::Binary::AnimationWriter::~AnimationWriter()
 {
-	
+	file.close();
 }
 
 void KleiAnim::Binary::AnimationWriter::writefile()
 {
-	output.write("ANIM", 4);
-	output.write((char*)(&AnimationBase::cur_version), 4);
+	file.write("ANIM", 4);
+	file.write((char*)(&AnimationBase::cur_version), 4);
 
+	unsigned int elem_total = 0, frame_total = 0, event_total = 0, anim_total = animations.size();
+	//elem_total,frame_total,event_total字段写完文件之后再插入
 
+	//animations
+	file.write(TO_PCHAR(anim_total), 4);
+	for (auto& anim : animations)
+	{
+		write_str(anim.name, file);
+		file.write(TO_PCHAR(anim.facing), 1);
+		file.write(TO_PCHAR(anim.rootsym_hash), 4);
+		file.write(TO_PCHAR(anim.frame_rate), 4);
+
+		unsigned int frame_count = anim.frames.size();
+		frame_total += frame_count;
+
+		//frame
+		file.write(TO_PCHAR(frame_count), 4);
+		for (auto& frame : anim.frames)
+		{
+			unsigned int event_count(frame.events.size()), elem_count(frame.elements.size());
+
+			event_total += event_count;
+			elem_total += elem_count;
+
+			//event
+			file.write(TO_PCHAR(event_count), 4);
+			if (event_total != 0)
+				file.write(reinterpret_cast<char*>(frame.events.data()), size_t(4) * frame.events.size());
+
+			//elmement
+			file.write(TO_PCHAR(elem_count), 4);
+			file.write(reinterpret_cast<char*>(frame.elements.data()), size_t(40) * frame.elements.size());
+		}
+	}
+	
+	//hashed string table
+	for (auto& pair : str_table)
+	{
+		file.write(TO_CONST_PCHAR(pair.first), 4);
+		unsigned int strsize(pair.second.size());
+		file.write(TO_CONST_PCHAR(strsize), 4);
+		file.write(pair.second.c_str(), pair.second.size());
+	}
+
+	//插入之前跳过的字段
+	file.seekp(8);
+	file.write(TO_PCHAR(elem_total), 4);
+	file.write(TO_PCHAR(frame_total), 4);
+	file.write(TO_PCHAR(event_total), 4);
+
+	file.flush();
 }
 
 void KleiAnim::Binary::AnimationWriter::add(Common::AnimationNode& anim)
@@ -424,7 +487,7 @@ void KleiAnim::Binary::AnimationWriter::add(Common::AnimationNode& anim)
 	animations.push_back(anim);
 }
 
-KleiAnim::Binary::BuildWriter::BuildWriter(const std::filesystem::path& out) :output(std::ofstream(out, ios::binary | ios::trunc))
+KleiAnim::Binary::BuildWriter::BuildWriter(const std::filesystem::path& out) :file(std::ofstream(out, ios::binary | ios::trunc))
 {
 	cc4 = valid_cc4;
 	version = cur_version;
@@ -432,4 +495,5 @@ KleiAnim::Binary::BuildWriter::BuildWriter(const std::filesystem::path& out) :ou
 
 KleiAnim::Binary::BuildWriter::~BuildWriter()
 {
+	file.close();
 }

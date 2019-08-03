@@ -229,7 +229,7 @@ namespace KleiAnim
 			/// <changed>Fa鸽,2019/8/2</changed>
 			void add(Common::AnimationNode& anim);
 		private:
-			std::ofstream output;
+			std::ofstream file;
 		};
 
 		class EXPORT_API BuildWriter : BuildBase
@@ -285,7 +285,7 @@ namespace KleiAnim
 			/// <changed>Fa鸽,2019/8/2</changed>
 			void add(const std::array<Common::AlphaVertexNode,6>& vertices);
 		private:
-			std::ofstream output;//设计用于向zip写入数据
+			std::ofstream file;//设计用于向zip写入数据
 		};
 	}
 }

@@ -6,7 +6,7 @@
 using std::string;
 using std::exception;
 
-#define READ_INTO(x) (char*)&(x) 
+#define TO_PCHAR(x) (char*)&(x) 
 
 unsigned int KleiAnim::Common::hash(std::string&& s)
 {
@@ -21,7 +21,7 @@ unsigned int KleiAnim::Common::hash(std::string&& s)
 string KleiAnim::Common::read_str(std::istream& f)
 {
 	unsigned int strsize;
-	f.read(READ_INTO(strsize), 4);
+	f.read(TO_PCHAR(strsize), 4);
 	char* c_name = new char[strsize]{ 0 };
 	f.read(c_name, strsize);
 	string ret(c_name, c_name + strsize);
@@ -36,12 +36,12 @@ std::map<unsigned int,string> KleiAnim::Common::read_strhashtable(std::ifstream&
 	unsigned int pair_count = 0, strsize = 0, hash = 0;
 	char* buffier = new char[buff_size] {0};
 
-	file.read(READ_INTO(pair_count), 4);
+	file.read(TO_PCHAR(pair_count), 4);
 
 	for (unsigned int i = 0; i < pair_count; i++)
 	{
-		file.read(READ_INTO(hash), 4);//这里MSVC debug x64的对齐策略导致size和hash不连续
-		file.read(READ_INTO(strsize), 4);
+		file.read(TO_PCHAR(hash), 4);//这里MSVC debug x64的对齐策略导致size和hash不连续
+		file.read(TO_PCHAR(strsize), 4);
 
 		if (strsize > buff_size)
 		{
@@ -89,6 +89,15 @@ bool KleiAnim::Common::operator==(const ElementNode& l, const ElementNode& r)
 KleiAnim::Common::CharLog::CharLog(std::ostream& output)
 {
 	stream = &output;
+	try
+	{
+		stream->imbue(std::locale("chs"));//忽略C26444，std::locale有不同的析构逻辑
+	}
+	catch (const std::runtime_error& e)
+	{
+		stream->imbue(std::locale("C"));
+		std::cerr << e.what();
+	}
 	in_use ? in_use : in_use = this;
 }
 
