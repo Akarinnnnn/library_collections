@@ -33,8 +33,8 @@ namespace KleiAnim
 			///<summary>当前版本</summary>
 			static constexpr unsigned short cur_version = 0x0006;
 
-			unsigned int symbol_count;
-			unsigned int frame_count;
+			unsigned int symbol_count = 0;
+			unsigned int frame_count = 0;
 			std::string build_name;
 
 			std::vector<Common::AtlasNode> atlases;
@@ -53,6 +53,10 @@ namespace KleiAnim
 
 			unsigned int anim_count() const;
 			
+			std::vector<Common::AnimationNode>::const_iterator begin() const;
+			std::vector<Common::AnimationNode>::const_iterator end() const;
+
+
 			/// <summary>
 			/// 返回hash对应的字符串，建议结合std::move使用
 			/// </summary>
@@ -110,8 +114,6 @@ namespace KleiAnim
 			/// <created>Fa鸽,2019/7/29</created>
 			/// <changed>Fa鸽,2019/7/29</changed>
 			const std::vector<Common::ElementNode>& element_refs(const size_t anim, const size_t frame) const;
-		private:
-			std::ifstream file;
 		};
 
 		/// <summary>
@@ -193,10 +195,7 @@ namespace KleiAnim
 			/// <returns></returns>
 			/// <created>Fa鸽,2019/8/2</created>
 			/// <changed>Fa鸽,2019/8/2</changed>
-			const Common::BuildFrameNode& frame(const size_t sym, const size_t i) const;
-			
-		private:
-			std::ifstream file;
+			const Common::BuildFrameNode& frame(const size_t sym, const size_t i) const;			
 		};
 
 		class EXPORT_API AnimationWriter :AnimationBase
@@ -222,14 +221,23 @@ namespace KleiAnim
 			void writefile();
 
 			/// <summary>
+			/// 将内容写入到流
+			/// </summary>
+			/// <param name="out"></param>
+			/// <created>Fa鸽,2019/8/17</created>
+			/// <changed>Fa鸽,2019/8/17</changed>
+			void writestream(std::ostream& out);
+
+			/// <summary>
 			/// 添加一段动画
 			/// </summary>
 			/// <param name="anim">待添加的动画</param>
 			/// <created>Fa鸽,2019/8/2</created>
 			/// <changed>Fa鸽,2019/8/2</changed>
 			void add(Common::AnimationNode& anim);
-		private:
-			std::ofstream file;
+
+			/// <summary>输出文件的路径</summary>
+			std::filesystem::path out;
 		};
 
 		class EXPORT_API BuildWriter : BuildBase
@@ -252,6 +260,14 @@ namespace KleiAnim
 			/// <created>Fa鸽,2019/8/2</created>
 			/// <changed>Fa鸽,2019/8/2</changed>
 			void writefile();
+
+			/// <summary>
+			/// 将内容写入到流
+			/// </summary>
+			/// <param name="out"></param>
+			/// <created>Fa鸽,2019/8/17</created>
+			/// <changed>Fa鸽,2019/8/17</changed>
+			void writestream(std::ostream& out);
 
 			/// <summary>
 			/// 添加一个符号
@@ -284,8 +300,9 @@ namespace KleiAnim
 			/// <created>Fa鸽,2019/8/2</created>
 			/// <changed>Fa鸽,2019/8/2</changed>
 			void add(const std::array<Common::AlphaVertexNode,6>& vertices);
-		private:
-			std::ofstream file;
+
+			/// <summary>输出文件的路径</summary>
+			std::filesystem::path out;
 		};
 	}
 }

@@ -29,6 +29,7 @@ using std::ios;
 #define PRINT_TIME std::cout<< "T = " << std::chrono::high_resolution_clock::now().time_since_epoch().count() << "ns" << std::endl
 #endif // DEBUG
 
+#pragma warning(disable:4267)//在MSVC上忽略C4267警告，初始化均经过检查
 
 //还不如st_read_elem，不信看看测试
 //留着以后看看能不能改进
@@ -95,17 +96,17 @@ void write_str(const std::string& s, std::ostream& o)
 	size_t size_ui64 = s.size();
 	if (size_ui64 > UINT32_MAX)
 		throw std::invalid_argument("KleiAnim/Binary.cpp " __FUNCTION__ " s:字符串过长");
-	unsigned int size(size_ui64);
+	unsigned int size = size_ui64;
 	
 	o.write(TO_PCHAR(size), 4);
 	o.write(s.data(), size);
 }
 
-AnimationReader::AnimationReader(const std::filesystem::path & animpath) : 
-	file(animpath, std::ios::binary | std::ios::in)
+AnimationReader::AnimationReader(const std::filesystem::path & animpath)
 {
 	using std::cout;
 	using std::endl;
+	std::ifstream file(animpath, std::ios::binary | std::ios::in);
 
 	{
 		std::error_code ec;
@@ -185,7 +186,7 @@ AnimationReader::AnimationReader(const std::filesystem::path & animpath) :
 				frame.elements.reserve(elem_count);
 
 				#ifndef MT_READ_ELEM
-				frame.elements = std::move(st_read_elem(this->file, elem_count));
+				frame.elements = std::move(st_read_elem(file, elem_count));
 				#else
 				mt_read_elem(elem_count, frame.elements, animpath, file.tellg());
 				#endif
@@ -228,6 +229,16 @@ unsigned int KleiAnim::Binary::AnimationReader::anim_count() const
 	return animations.size();
 }
 
+std::vector<Common::AnimationNode>::const_iterator KleiAnim::Binary::AnimationReader::begin() const
+{
+	return this->animations.begin();
+}
+
+std::vector<Common::AnimationNode>::const_iterator KleiAnim::Binary::AnimationReader::end() const
+{
+	return this->animations.end();
+}
+
 std::string KleiAnim::Binary::AnimationReader::de_hash(const unsigned int hash) const
 {
 	return str_table.at(hash);
@@ -258,11 +269,12 @@ const std::vector<Common::ElementNode>& KleiAnim::Binary::AnimationReader::eleme
 	return animations[anim].frames[frame].elements;
 }
 
-BuildReader::BuildReader(const std::filesystem::path & buildpath) : 
-	file(buildpath, std::ios::binary | std::ios::in)
+BuildReader::BuildReader(const std::filesystem::path & buildpath)
+	
 {
 	using std::cout;
 	using std::endl;
+	std::ifstream file(buildpath, std::ios::binary | std::ios::in);
 
 	{
 		std::error_code ec;
@@ -407,28 +419,41 @@ const Common::BuildFrameNode& KleiAnim::Binary::BuildReader::frame(const size_t 
 	return symbols.at(sym).frames.at(i);
 }
 
-KleiAnim::Binary::AnimationWriter::AnimationWriter(const std::filesystem::path& out) :file(out, ios::binary | ios::trunc | ios::out)
+KleiAnim::Binary::AnimationWriter::AnimationWriter(const std::filesystem::path& out) :out(out)
 {
 	cc4 = valid_cc4;
 	version = cur_version;
 }
 
-KleiAnim::Binary::AnimationWriter::AnimationWriter(const std::filesystem::path& out, const AnimationBase & base)
-	:file(out, ios::binary | ios::trunc | ios::out),
-	AnimationBase(base)
+KleiAnim::Binary::AnimationWriter::AnimationWriter(const std::filesystem::path& out, const AnimationBase& base) :
+	AnimationBase(base), out(out)
 {}
 
 KleiAnim::Binary::AnimationWriter::~AnimationWriter()
 {
-	file.close();
 }
 
 void KleiAnim::Binary::AnimationWriter::writefile()
 {
+	std::ofstream file(out, ios::binary | ios::trunc | ios::out);
+	if (!file.is_open())
+	{
+		path out = ".\\默认输出\\anim-" + animations[0].name + ".bin";
+		KleiAnimLog::write() << LOG("打开失败，指定的路径为:") << this->out << LOG("\n输出到默认路径:") << out;
+		file.open(out, ios::binary | ios::trunc | ios::out);
+	}
+	writestream(file);
+	file.close();
+}
+
+void KleiAnim::Binary::AnimationWriter::writestream(std::ostream& file)
+{
+
 	file.write("ANIM", 4);
 	file.write(TO_CONST_PCHAR(cur_version), 4);
 
-	unsigned int elem_total = 0, frame_total = 0, event_total = 0, anim_total = animations.size();
+	unsigned int elem_total = 0, frame_total = 0, event_total = 0, anim_total;
+	animations.size() > UINT32_MAX ? throw std::overflow_error("animations.size > UINT32_MAX") : anim_total = animations.size();
 	//elem_total,frame_total,event_total字段写完文件之后再插入
 
 	//animations
@@ -440,14 +465,19 @@ void KleiAnim::Binary::AnimationWriter::writefile()
 		file.write(TO_PCHAR(anim.rootsym_hash), 4);
 		file.write(TO_PCHAR(anim.frame_rate), 4);
 
-		unsigned int frame_count = anim.frames.size();
+		unsigned int frame_count;
+		anim.frames.size() > UINT32_MAX ? throw std::overflow_error("anim.frames.size() > UINT32_MAX") : frame_count = anim.frames.size();
 		frame_total += frame_count;
 
 		//frame
 		file.write(TO_PCHAR(frame_count), 4);
 		for (auto& frame : anim.frames)
 		{
-			unsigned int event_count(frame.events.size()), elem_count(frame.elements.size());
+			unsigned int event_count, elem_count;
+			frame.events.size() > UINT32_MAX ? throw std::overflow_error("frame.events.size() > UINT32_MAX") : event_count = frame.events.size();
+			frame.elements.size() > UINT32_MAX ? throw std::overflow_error("frame.elements.size() > UINT32_MAX") : elem_count = frame.elements.size();
+
+
 
 			event_total += event_count;
 			elem_total += elem_count;
@@ -462,16 +492,20 @@ void KleiAnim::Binary::AnimationWriter::writefile()
 			file.write(reinterpret_cast<char*>(frame.elements.data()), size_t(40) * frame.elements.size());
 		}
 	}
-	
+
 	//str table
 	{
-		unsigned int table_count(str_table.size());
+		unsigned int table_count;
+		str_table.size() > UINT32_MAX ? throw std::overflow_error("str_table.size() > UINT32_MAX") : table_count = str_table.size();
 		file.write(TO_PCHAR(table_count), 4);
 		for (auto& pair : str_table)
 		{
-			unsigned int strsize(pair.second.size());
+#undef max
+			unsigned int strsize;
+			pair.second.size() > std::numeric_limits<unsigned int>::max() ? throw std::overflow_error("写入字符串表出错，字符串过长") : strsize = pair.second.size();
 
 			file.write(TO_CONST_PCHAR(pair.first), 4);
+
 			file.write(TO_CONST_PCHAR(strsize), 4);
 			file.write(pair.second.c_str(), pair.second.size());
 		}
@@ -491,23 +525,35 @@ void KleiAnim::Binary::AnimationWriter::add(Common::AnimationNode& anim)
 	animations.push_back(anim);
 }
 
-KleiAnim::Binary::BuildWriter::BuildWriter(const std::filesystem::path& out) :file(out, ios::binary | ios::trunc | ios::out)
+KleiAnim::Binary::BuildWriter::BuildWriter(const std::filesystem::path& out) :out(out)
 {
 	cc4 = valid_cc4;
 	version = cur_version;
 }
 
-KleiAnim::Binary::BuildWriter::BuildWriter(const std::filesystem::path& out, const BuildBase& base)
-	:file(out, ios::trunc | ios::binary | ios::out),
-	BuildBase(base)
+KleiAnim::Binary::BuildWriter::BuildWriter(const std::filesystem::path& out, const BuildBase& base) :
+	BuildBase(base), out(out)
 {}
 
 KleiAnim::Binary::BuildWriter::~BuildWriter()
 {
-	file.close();
 }
 
 void KleiAnim::Binary::BuildWriter::writefile()
+{
+	std::ofstream file(out, ios::binary | ios::trunc | ios::out);
+	if (!file.is_open())
+	{
+		path out = ".\\默认输出\\build-" + build_name + ".bin";
+		KleiAnimLog::write() << LOG("打开失败，指定的路径为:") << this->out << LOG("\n输出到默认路径:") << out;
+		file.open(out, ios::binary | ios::trunc | ios::out);
+	}
+	writestream(file);
+	file.close();
+
+}
+
+void KleiAnim::Binary::BuildWriter::writestream(std::ostream& file)
 {
 	file.write("BILD", 4);
 	file.write(TO_CONST_PCHAR(cur_version), 4);
@@ -518,7 +564,8 @@ void KleiAnim::Binary::BuildWriter::writefile()
 
 	//atlas
 	{
-		unsigned int atlas_count(atlases.size());
+		unsigned int atlas_count;
+		atlases.size() > UINT32_MAX ? throw std::overflow_error("atlases.size() > UINT32_MAX") : atlas_count = atlases.size();
 		file.write(TO_PCHAR(atlas_count), 4);
 		for (auto& atlas : atlases)
 		{
@@ -529,8 +576,9 @@ void KleiAnim::Binary::BuildWriter::writefile()
 	//symbol
 	for (auto& symbol : symbols)
 	{
-		unsigned frame_count(symbol.frames.size());
-		
+		unsigned frame_count;
+		symbol.frames.size() > UINT32_MAX ? throw std::overflow_error("symbol.frames.size() > UINT32_MAX") : frame_count = symbol.frames.size();
+
 		file.write(TO_PCHAR(symbol.name_hash), 4);
 		file.write(TO_PCHAR(frame_count), 4);
 
@@ -543,7 +591,9 @@ void KleiAnim::Binary::BuildWriter::writefile()
 
 	//alpha vertex
 	{
-		unsigned int vertex_count(vertices.size());
+		unsigned int vertex_count;
+		vertices.size() > UINT32_MAX ? throw std::overflow_error("vertices.size() > UINT32_MAX") : vertex_count = vertices.size();
+
 		file.write(TO_PCHAR(vertex_count), 4);
 		for (auto& avn : vertices)
 		{
@@ -553,13 +603,17 @@ void KleiAnim::Binary::BuildWriter::writefile()
 
 	//str table
 	{
-		unsigned int table_count(str_table.size());
+		unsigned int table_count;
+		str_table.size() > UINT32_MAX ? throw std::overflow_error("str_table.size() > UINT32_MAX") : table_count = str_table.size();
+
 		file.write(TO_PCHAR(table_count), 4);
 		for (auto& pair : str_table)
 		{
-			unsigned int strsize(pair.second.size());
+			unsigned int strsize;
+			pair.second.size() > UINT32_MAX ? throw std::overflow_error("写入字符串表出错，字符串过长") : strsize = pair.second.size();
 
 			file.write(TO_CONST_PCHAR(pair.first), 4);
+
 			file.write(TO_CONST_PCHAR(strsize), 4);
 			file.write(pair.second.c_str(), pair.second.size());
 		}

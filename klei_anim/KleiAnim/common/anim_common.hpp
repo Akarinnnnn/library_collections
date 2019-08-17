@@ -11,14 +11,12 @@
 #include <map>
 #include "export.h"
 #include <sstream>
-#include <functional>
-
 
 #ifndef KLEIANIM_USE_CHARLOG
 #define KleiAnimLog KleiAnim::Common::WideCharLog
 #else
 #define KleiAnimLog KleiAnim::Common::CharLog
-#endif // KLEIANIM_USE_CHLOG
+#endif // KLEIANIM_USE_CHARLOG
 
 
 
@@ -71,7 +69,7 @@ namespace KleiAnim
 		};
 
 		///<summary>
-		///图片朝向
+		///图片朝向，Flag
 		///</summary>
 		enum class Facing : unsigned char
 		{
@@ -129,7 +127,7 @@ namespace KleiAnim
 		/// </summary>
 		struct AlphaVertexNode
 		{
-			float x, y, z, u, v, w;
+			float x = 0, y = 0, z = 0, u = 0, v = 0, w = 0;
 		};
 
 		/// <summary>
@@ -138,17 +136,17 @@ namespace KleiAnim
 		struct BuildFrameNode
 		{
 			/// <summary>帧号</summary>
-			unsigned int frame_number;
+			unsigned int frame_number = 0;
 
 			/// <summary>持续时间</summary>
-			unsigned int duration;
+			unsigned int duration = 1;
 
 			/// <summary>bbox xywh参数</summary>
-			float x, y, w, h;
+			float x = 0, y = 0, w = 0, h = 0;
 
 
-			unsigned int alpha_index;
-			unsigned int alpha_count;
+			unsigned int alpha_index = 0;
+			unsigned int alpha_count = 0;
 		};
 
 		/// <summary>
@@ -156,7 +154,7 @@ namespace KleiAnim
 		/// </summary>
 		struct SymbolNode
 		{
-			unsigned int name_hash;
+			unsigned int name_hash = 0;
 			std::vector<BuildFrameNode> frames;
 		};
 
@@ -172,16 +170,9 @@ namespace KleiAnim
 			{
 				return name_hash;
 			}
-
-			EventNode()
-			{
-				name_hash = 0;
-			}
-
-			EventNode(unsigned int h)
-			{
-				name_hash = h;
-			}
+			
+			EventNode() : name_hash(0) {}
+			EventNode(unsigned int h):name_hash(h) {}
 		};
 
 		/// <summary>
@@ -190,13 +181,13 @@ namespace KleiAnim
 		struct ElementNode
 		{
 			/// <summary>哈希</summary>
-			unsigned int name_hash;
-			unsigned int frame;
-			unsigned int layer_hash;
+			unsigned int name_hash = 0;
+			unsigned int frame = 0;
+			unsigned int layer_hash = 0;
 
-			float a, b, c, d;
-			float tx, ty;
-			float z;
+			float a = 0, b = 0, c = 0, d = 0;
+			float tx = 0, ty = 0;
+			float z = 1.0f;
 		};
 
 		/// <summary>
@@ -204,7 +195,7 @@ namespace KleiAnim
 		/// </summary>
 		struct AnimationFrameNode
 		{
-			float x, y, w, h;
+			float x = 0, y = 0, w = 0, h = 0;
 
 			std::vector<EventNode> events;//event count + event
 			std::vector<ElementNode> elements;//elem count + elems
@@ -218,13 +209,13 @@ namespace KleiAnim
 			std::string name;
 
 			/// <summary>朝向</summary>
-			Facing facing;
+			Facing facing = Facing::all;
 
 			/// <summary>根符号哈希</summary>
-			unsigned int rootsym_hash;
+			unsigned int rootsym_hash = 0;
 
 			/// <summary>帧率</summary>
-			float frame_rate;
+			float frame_rate = 10.0f;
 
 			std::vector<AnimationFrameNode> frames;
 		};
