@@ -14,6 +14,7 @@
 #include <mutex>
 #include <charconv>
 #include <chrono>
+#include <initializer_list>
 
 #include "CppUnitTest.h"
 #include <Windows.h>
@@ -48,43 +49,37 @@ template<> std::wstring Microsoft::VisualStudio::CppUnitTestFramework::ToString<
 	switch (f)
 	{
 	case facing::all:
-		_s << L"all dir";
+		_s << L"all direction";
 		break;
+		[[fallthrough]]//这是故意的
 	case facing::all45:
 		_s << L"all 45";
-		break;
 	case facing::all90:
 		_s << L"all 90";
 		break;
+		[[fallthrough]]//标记一下
 	case facing::down:
 		_s << L"down";
-		break;
 	case facing::downleft:
 		_s << L"down left";
-		break;
 	case facing::downright:
 		_s << L"down right";
-		break;
 	case facing::left:
 		_s << L"left";
-		break;
 	case facing::right:
 		_s << L"right";
-		break;
 	case facing::up:
 		_s << L"up";
-		break;
 	case facing::upleft:
 		_s << L"up left";
-		break;
 	case facing::upright:
 		_s << L"up right";
 		break;
 	case facing::invalid:
-		_s << L"invalid direction(0x00)";
+		_s << L"invalid direction(0x00ui8)";
 		break;
 	default:
-		_s << L"unknown direction, check stacktrace.";
+		Logger::WriteMessage(L"unknown direction??????\ncheck stacktrace.");
 		break;
 	}
 	return _s.str();
@@ -276,6 +271,48 @@ namespace ktexlibtest
 			Assert::AreEqual(0u, frame0.alpha_index, L"alpha index != 0");
 
 			//todo:vertices assert
+		}
+
+		TEST_METHOD(BinBuildWrite)
+		{
+			using namespace KleiAnim::Binary;
+			using namespace KleiAnim::Common;
+			BuildBase TestBase(2, 3, "TestBuild",
+				{
+					AtlasNode{"atlas-0"}
+				},
+				{
+					SymbolNode
+					{
+						0U,
+						{
+							BuildFrameNode(),
+							BuildFrameNode{1,2,0,0,24.0f,24.0f,0,0}
+						}
+					},
+					SymbolNode
+					{
+						1U,
+						{
+							BuildFrameNode{2,2,0,0,24.0f,24.0f,0,0}
+						}
+					}
+				},
+				{}
+			);
+
+			BuildWriter test_write("test-write-build.bin",TestBase);
+
+			BuildReader read_out("test-write-build.bin");
+			for (auto& i : read_out)
+			{
+
+			}
+		}
+
+		TEST_METHOD(BinAnimWrite)
+		{
+
 		}
 	private:
 

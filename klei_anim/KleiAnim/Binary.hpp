@@ -15,6 +15,16 @@ namespace KleiAnim
 	{
 		class EXPORT_API AnimationBase: protected virtual Common::BinaryFileBase
 		{
+		public:
+			AnimationBase() = default;
+
+			AnimationBase(const std::vector<Common::AnimationNode>& animations) :animations(animations)
+			{
+
+			}
+
+			std::wstring ToString();
+
 		protected:
 			///<summary>合规文件的CC4，ANIM</summary>
 			static constexpr unsigned int valid_cc4 = 0x4D494E41;
@@ -27,6 +37,23 @@ namespace KleiAnim
 
 		class EXPORT_API BuildBase : protected virtual Common::BinaryFileBase
 		{
+		public:
+			BuildBase() = default;
+
+			BuildBase(unsigned int symbol_count, unsigned int frame_count,
+				const std::string& build_name, const std::vector<Common::AtlasNode>& atlases,
+				const std::vector<Common::SymbolNode>& symbols,
+				const std::vector<Common::AlphaVertexNode>& vertices) :
+				symbol_count(symbol_count),
+				frame_count(frame_count),
+				build_name(build_name),
+				atlases(atlases),
+				symbols(symbols),
+				vertices(vertices)
+			{}
+
+			std::wstring ToString();
+
 		protected:
 			///<summary>合规文件的CC4，BILD</summary>
 			static constexpr unsigned int valid_cc4 = 0x444C4942;
@@ -45,7 +72,7 @@ namespace KleiAnim
 		/// <summary>
 		/// anim.bin读取器
 		/// </summary>
-		class EXPORT_API AnimationReader : protected AnimationBase
+		class EXPORT_API AnimationReader : public AnimationBase
 		{
 		public:
 			AnimationReader() = delete;
@@ -119,7 +146,7 @@ namespace KleiAnim
 		/// <summary>
 		/// build.bin读取器
 		/// </summary>
-		class EXPORT_API BuildReader :protected BuildBase
+		class EXPORT_API BuildReader :public BuildBase
 		{
 		public:
 			BuildReader() = delete;
@@ -198,7 +225,7 @@ namespace KleiAnim
 			const Common::BuildFrameNode& frame(const size_t sym, const size_t i) const;			
 		};
 
-		class EXPORT_API AnimationWriter :AnimationBase
+		class EXPORT_API AnimationWriter :public AnimationBase
 		{
 		public:
 
@@ -240,7 +267,7 @@ namespace KleiAnim
 			std::filesystem::path out;
 		};
 
-		class EXPORT_API BuildWriter : BuildBase
+		class EXPORT_API BuildWriter :public BuildBase
 		{
 		public:
 			/// <summary>

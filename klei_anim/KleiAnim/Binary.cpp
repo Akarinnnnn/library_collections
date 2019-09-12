@@ -645,3 +645,8 @@ void KleiAnim::Binary::BuildWriter::add(const std::array<Common::AlphaVertexNode
 		BuildBase::vertices.push_back(vert);
 	}
 }
+
+std::wstring KleiAnim::Binary::BuildBase::ToString()
+{
+	return std::wstring();
+}
