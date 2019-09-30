@@ -661,5 +661,18 @@ void KleiAnim::Binary::BuildWriter::add(const std::array<Common::AlphaVertexNode
 
 std::wstring KleiAnim::Binary::BuildBase::ToString()
 {
-	return std::wstring();
+	using std::wostringstream;
+	wostringstream o;
+
+	o << L"Build名：" << build_name.c_str() << L'\n'
+		<< L"符号数量：" << symbol_count << L'\n'
+		<< L"帧数量：" << frame_count << L'\n'
+		<< L"atlas：" << L"\n";
+
+	for (auto& atlas : atlases)
+	{
+		o << L"  " << atlas.name.c_str() << L'\n';
+	}
+
+	return o.str();
 }
