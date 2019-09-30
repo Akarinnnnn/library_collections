@@ -659,7 +659,7 @@ void KleiAnim::Binary::BuildWriter::add(const std::array<Common::AlphaVertexNode
 	}
 }
 
-std::wstring KleiAnim::Binary::BuildBase::ToString()
+std::wstring KleiAnim::Common::BuildBase::ToString()
 {
 	using std::wostringstream;
 	wostringstream o;

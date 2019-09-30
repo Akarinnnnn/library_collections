@@ -307,5 +307,67 @@ namespace KleiAnim
 		/// <created>Fa鸽,2019/7/27</created>
 		/// <changed>Fa鸽,2019/7/27</changed>
 		bool EXPORT_API operator==(const ElementNode& l, const ElementNode& r);
+
+		class EXPORT_API AnimationBase : protected virtual Common::BinaryFileBase
+		{
+			//friend void ::KleiAnim::AnimBin2XML(Common::AnimationBase& binary, std::filesystem::path xmlpath);
+
+
+		public:
+			AnimationBase() = default;
+
+			AnimationBase(const std::vector<Common::AnimationNode>& animations,
+				const std::map<unsigned int, std::string>& string_table) :animations(animations), BinaryFileBase(string_table)
+			{
+
+			}
+
+		protected:
+			///<summary>合规文件的CC4，ANIM</summary>
+			static constexpr unsigned int valid_cc4 = 0x4D494E41;
+			///<summary>当前版本</summary>
+			static constexpr unsigned short cur_version = 0x0004;
+
+			/// <summary>animation</summary>
+			std::vector<Common::AnimationNode> animations;
+		};
+
+		class EXPORT_API BuildBase : protected virtual Common::BinaryFileBase
+		{
+			//friend void ::KleiAnim::BuildBin2XML(Common::BuildBase& binary, std::filesystem::path xmlpath);
+
+		public:
+			BuildBase() = default;
+
+			BuildBase(unsigned int symbol_count, unsigned int frame_count,
+				const std::string& build_name, const std::vector<Common::AtlasNode>& atlases,
+				const std::vector<Common::SymbolNode>& symbols,
+				const std::vector<Common::AlphaVertexNode>& vertices) :
+				symbol_count(symbol_count),
+				frame_count(frame_count),
+				build_name(build_name),
+				atlases(atlases),
+				symbols(symbols),
+				vertices(vertices)
+			{}
+
+			std::wstring ToString();
+
+		protected:
+			///<summary>合规文件的CC4，BILD</summary>
+			static constexpr unsigned int valid_cc4 = 0x444C4942;
+			///<summary>当前版本</summary>
+			static constexpr unsigned short cur_version = 0x0006;
+
+			unsigned int symbol_count = 0;
+			unsigned int frame_count = 0;
+			std::string build_name;
+
+			std::vector<Common::AtlasNode> atlases;
+			std::vector<Common::SymbolNode> symbols;
+			std::vector<Common::AlphaVertexNode> vertices;
+		};
+
+
 	}
 }

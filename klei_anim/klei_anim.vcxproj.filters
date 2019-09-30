@@ -68,13 +68,16 @@
     <ClCompile Include="KleiAnim\common\exceptions.cpp">
       <Filter>源文件\KleiAnim\Shared</Filter>
     </ClCompile>
+    <ClCompile Include="KleiAnim\Xml.cpp">
+      <Filter>源文件\KleiAnim</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="KleiAnim\XML Schema\XmlAnimation.xsd">
-      <Filter>头文件</Filter>
-    </None>
-    <None Include="KleiAnim\XML Schema\XmlBuild.xsd">
-      <Filter>头文件</Filter>
-    </None>
+    <CopyFileToFolders Include="KleiAnim\XML Schema\XmlBuild.xsd">
+      <Filter>资源文件\XML架构文档</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="KleiAnim\XML Schema\XmlAnimation.xsd">
+      <Filter>资源文件\XML架构文档</Filter>
+    </CopyFileToFolders>
   </ItemGroup>
 </Project>
