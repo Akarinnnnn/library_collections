@@ -18,12 +18,11 @@ namespace KleiAnim
 		public:
 			AnimationBase() = default;
 
-			AnimationBase(const std::vector<Common::AnimationNode>& animations) :animations(animations)
+			AnimationBase(const std::vector<Common::AnimationNode>& animations,
+				const std::map<unsigned int, std::string>& string_table) :animations(animations), BinaryFileBase(string_table)
 			{
 
 			}
-
-			std::wstring ToString();
 
 		protected:
 			///<summary>合规文件的CC4，ANIM</summary>

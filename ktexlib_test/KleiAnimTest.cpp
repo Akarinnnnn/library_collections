@@ -27,11 +27,9 @@ using std::ios;
 
 
 
-template <>
-std::wstring
-Microsoft::VisualStudio::CppUnitTestFramework::ToString
-	<KleiAnim::Common::ElementNode>
-	(const KleiAnim::Common::ElementNode& elem)
+template<> std::wstring
+Microsoft::VisualStudio::CppUnitTestFramework::ToString <KleiAnim::Common::ElementNode>
+(const KleiAnim::Common::ElementNode& elem)
 {
 	std::wostringstream _s;
 	_s << L"Name Hash = " << elem.name_hash << '\n'
@@ -42,7 +40,8 @@ Microsoft::VisualStudio::CppUnitTestFramework::ToString
 	return _s.str();
 }
 
-template<> std::wstring Microsoft::VisualStudio::CppUnitTestFramework::ToString<KleiAnim::Common::Facing>
+template<> std::wstring 
+Microsoft::VisualStudio::CppUnitTestFramework::ToString<KleiAnim::Common::Facing>
 (const KleiAnim::Common::Facing& f)
 {
 	using facing = KleiAnim::Common::Facing;
@@ -362,10 +361,62 @@ namespace ktexlibtest
 
 		}
 
-		/*TEST_METHOD(BinAnimWrite)
+		TEST_METHOD(BinAnimWrite)
 		{
+			using namespace KleiAnim::Binary;
+			using namespace KleiAnim::Common;
+			using namespace std::string_literals;
+			using std::make_pair;
+			WideCharLog a(std::wcout);
 
-		}*/
+
+			AnimationBase base
+			(
+				{
+					AnimationNode
+					{
+						"test_anim"s,Facing::all,20,20.0f,
+						{
+							AnimationFrameNode
+							{
+								0.0f,1.0f,2.0f,3.0f,{EventNode(30)},{ElementNode{10,0,0}}
+							}
+						}
+					}
+				}, { make_pair(20,"rootsymbol"s),make_pair(30,"event0"s),make_pair(10,"elem0"s),make_pair(0,"layer0"s) }
+			);
+
+			AnimationWriter testw(".\\test-write-anim.bin",base);
+			testw.writefile();
+
+			AnimationReader testr(".\\test-write-anim.bin");
+
+			{
+				auto& anim0 = *testr.begin();
+				Assert::AreEqual(Facing::all, anim0.facing);
+				Assert::AreEqual(20u, anim0.rootsym_hash);
+				Assert::AreEqual(20.0f, anim0.frame_rate);
+
+				{
+					auto& f = *anim0.frames.begin();
+					Assert::AreEqual(0.0f, f.x);;
+					Assert::AreEqual(1.0f, f.y);
+					Assert::AreEqual(2.0f, f.w);
+					Assert::AreEqual(3.0f, f.h);
+
+					Assert::AreEqual(30u, f.events[0].name_hash);
+
+					{
+						auto& elem = f.elements[0];
+						Assert::AreEqual(10u, elem.name_hash);
+						Assert::AreEqual(0u, elem.frame);
+						Assert::AreEqual(0u, elem.layer_hash);
+						//剩下的偷懒不测试了
+					}
+					
+				}
+			}
+		}
 	private:
 
 		bool Contains(std::vector<KleiAnim::Common::ElementNode>& actual, KleiAnim::Common::ElementNode& excepted_elem)

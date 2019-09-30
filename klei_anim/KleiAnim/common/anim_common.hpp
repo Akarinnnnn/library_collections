@@ -118,6 +118,13 @@ namespace KleiAnim
 			unsigned int cc4 = 0;
 			signed int version = 0;
 
+			BinaryFileBase() = default;
+
+			BinaryFileBase(std::map<unsigned int, std::string> string_table) :str_table(string_table)
+			{
+
+			}
+
 			/// <summary>¹þÏ£»¯×Ö·û´®±í</summary>
 			std::map<unsigned int, std::string> str_table;
 		};

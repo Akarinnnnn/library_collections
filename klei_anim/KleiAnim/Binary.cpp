@@ -454,7 +454,9 @@ void KleiAnim::Binary::AnimationWriter::writestream(std::ostream& file)
 
 	unsigned int elem_total = 0, frame_total = 0, event_total = 0, anim_total;
 	animations.size() > UINT32_MAX ? throw std::overflow_error("animations.size > UINT32_MAX") : anim_total = animations.size();
-	//elem_total,frame_total,event_total字段写完文件之后再插入
+	//elem_total,frame_total,event_total字段写完文件之后再写入
+	//写入12字节占位
+	file.write("0123456789a", 12);
 
 	//animations
 	file.write(TO_PCHAR(anim_total), 4);
@@ -477,10 +479,11 @@ void KleiAnim::Binary::AnimationWriter::writestream(std::ostream& file)
 			frame.events.size() > UINT32_MAX ? throw std::overflow_error("frame.events.size() > UINT32_MAX") : event_count = frame.events.size();
 			frame.elements.size() > UINT32_MAX ? throw std::overflow_error("frame.elements.size() > UINT32_MAX") : elem_count = frame.elements.size();
 
-
-
 			event_total += event_count;
 			elem_total += elem_count;
+
+			//xywh
+			file.write(TO_CONST_PCHAR(frame.x), sizeof(float) * 4);
 
 			//event
 			file.write(TO_PCHAR(event_count), 4);
