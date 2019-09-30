@@ -18,6 +18,7 @@
 
 #include "CppUnitTest.h"
 #include <Windows.h>
+#include <iostream>
 
 static_assert(sizeof(unsigned long long) == 8);
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
@@ -51,13 +52,14 @@ template<> std::wstring Microsoft::VisualStudio::CppUnitTestFramework::ToString<
 	case facing::all:
 		_s << L"all direction";
 		break;
-		[[fallthrough]]//这是故意的
+		//[[fallthrough]]//这是故意的
 	case facing::all45:
 		_s << L"all 45";
+		break;
 	case facing::all90:
 		_s << L"all 90";
 		break;
-		[[fallthrough]]//标记一下
+		//[[fallthrough]]//标记一下
 	case facing::down:
 		_s << L"down";
 	case facing::downleft:
@@ -84,6 +86,32 @@ template<> std::wstring Microsoft::VisualStudio::CppUnitTestFramework::ToString<
 	}
 	return _s.str();
 }
+
+template<> std::wstring 
+Microsoft::VisualStudio::CppUnitTestFramework::ToString<::KleiAnim::Common::BuildFrameNode>
+(const ::KleiAnim::Common::BuildFrameNode& elem)
+{
+	std::wostringstream o;
+	o << L"Frame number = " << elem.frame_number << L'\n';
+	o << L"Duration = " << elem.duration << L'\n';
+	o << L"x,y,w,h = " << elem.x << L',' << elem.y << L',' << elem.w << L',' << elem.h << L'\n';
+	o << L"alpha_index = " << elem.alpha_index << L'\n' << L"alpha_count = " << elem.alpha_count << L'\n';
+	return o.str();
+}
+
+template<> std::wstring
+Microsoft::VisualStudio::CppUnitTestFramework::ToString<std::vector<::KleiAnim::Common::BuildFrameNode>>
+(const std::vector<::KleiAnim::Common::BuildFrameNode>& elem)
+{
+	std::wostringstream o;
+	for (auto& node : elem)
+	{
+		o << L"{\n" << ToString(node) << L"}\n";
+	}
+	return o.str();
+}
+
+
 
 namespace ktexlibtest
 {
@@ -277,6 +305,8 @@ namespace ktexlibtest
 		{
 			using namespace KleiAnim::Binary;
 			using namespace KleiAnim::Common;
+			WideCharLog a(std::wcout);
+
 			BuildBase TestBase(2, 3, "TestBuild",
 				{
 					AtlasNode{"atlas-0"}
@@ -301,19 +331,41 @@ namespace ktexlibtest
 				{}
 			);
 
-			BuildWriter test_write("test-write-build.bin",TestBase);
+			BuildWriter test_write("./test-write-build.bin",TestBase);
+			test_write.writefile();
 
-			BuildReader read_out("test-write-build.bin");
-			for (auto& i : read_out)
+			BuildReader read_out("./test-write-build.bin");
+			
+
 			{
+				using namespace std::string_literals;
+				Assert::AreEqual("atlas-0"s, read_out.atlas(0).name);
 
+				auto& sym0 = read_out[0];
+				auto& sym1 = read_out[1];
+
+				Assert::AreEqual(0U, sym0.name_hash);
+				Assert::AreEqual(1U, sym1.name_hash);
+
+				Assert::AreEqual(
+					{
+							BuildFrameNode(),
+							BuildFrameNode{1,2,0,0,24.0f,24.0f,0,0}
+					}, sym0.frames
+				);
+				Assert::AreEqual(
+					{
+							BuildFrameNode{2,2,0,0,24.0f,24.0f,0,0}
+					}, sym1.frames
+				);
 			}
+
 		}
 
-		TEST_METHOD(BinAnimWrite)
+		/*TEST_METHOD(BinAnimWrite)
 		{
 
-		}
+		}*/
 	private:
 
 		bool Contains(std::vector<KleiAnim::Common::ElementNode>& actual, KleiAnim::Common::ElementNode& excepted_elem)

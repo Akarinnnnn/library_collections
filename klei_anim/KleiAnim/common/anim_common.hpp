@@ -265,6 +265,32 @@ namespace KleiAnim
 		/// <changed>Fa鸽,2019/7/27</changed>
 		std::wstring EXPORT_API ToString(const ElementNode& elem);
 
+		inline std::wstring ToString(const BuildFrameNode& elem)
+		{
+			std::wostringstream o;
+			o << L"Frame number = " << elem.frame_number << L'\n';
+			o << L"Duration = " << elem.duration << L'\n';
+			o << L"x,y,w,h = " << elem.x << L',' << elem.y << L',' << elem.w << L',' << elem.h << L'\n';
+			o << L"alpha_index = " << elem.alpha_index << L'\n' << L"alpha_count = " << elem.alpha_count << L'\n';
+			return o.str();
+		}
+
+		template <typename T>
+		inline bool operator==(const T& lhs, const T& rhs)
+		{
+			static_assert(sizeof(T) % sizeof(size_t) == 0);
+
+			constexpr size_t size = sizeof(T) / sizeof(size_t);
+			auto* l = reinterpret_cast<const size_t*>(&lhs);
+			auto* r = reinterpret_cast<const size_t*>(&rhs);
+
+			for (size_t i = 0; i < size; i++)
+				if (*(l + i) != *(r + i)) return false;
+
+		}
+
+		
+
 		/// <summary>
 		/// 比较两个ElementNode是否相等
 		/// </summary>

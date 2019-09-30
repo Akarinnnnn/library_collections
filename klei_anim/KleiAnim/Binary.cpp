@@ -541,26 +541,31 @@ KleiAnim::Binary::BuildWriter::~BuildWriter()
 
 void KleiAnim::Binary::BuildWriter::writefile()
 {
-	std::ofstream file(out, ios::binary | ios::trunc | ios::out);
+	using std::ofstream;
+	ofstream file(out, ofstream::binary | ofstream::trunc);
 	if (!file.is_open())
 	{
-		path out = ".\\默认输出\\build-" + build_name + ".bin";
+		path out = "./默认输出/build-" + build_name + ".bin";
 		KleiAnimLog::write() << LOG("打开失败，指定的路径为:") << this->out << LOG("\n输出到默认路径:") << out;
-		file.open(out, ios::binary | ios::trunc | ios::out);
+		file.open(out, ofstream::binary | ofstream::trunc);
 	}
 	writestream(file);
-	file.close();
 
+	file.flush();
+	file.close();
 }
 
 void KleiAnim::Binary::BuildWriter::writestream(std::ostream& file)
 {
+	this->symbol_count = 0;
+	this->frame_count = 0;
+
 	file.write("BILD", 4);
 	file.write(TO_CONST_PCHAR(cur_version), 4);
-
+	this->symbol_count = symbols.size();
+	file.write(TO_CONST_PCHAR(this->symbol_count), 4);
+	file.write(TO_CONST_PCHAR(this->frame_count), 4);
 	write_str(build_name, file);
-
-	file.write(TO_PCHAR(BuildBase::symbol_count), 4);
 
 	//atlas
 	{
@@ -578,6 +583,8 @@ void KleiAnim::Binary::BuildWriter::writestream(std::ostream& file)
 	{
 		unsigned frame_count;
 		symbol.frames.size() > UINT32_MAX ? throw std::overflow_error("symbol.frames.size() > UINT32_MAX") : frame_count = symbol.frames.size();
+
+		this->frame_count += frame_count;
 
 		file.write(TO_PCHAR(symbol.name_hash), 4);
 		file.write(TO_PCHAR(frame_count), 4);
@@ -618,6 +625,9 @@ void KleiAnim::Binary::BuildWriter::writestream(std::ostream& file)
 			file.write(pair.second.c_str(), pair.second.size());
 		}
 	}
+
+	file.seekp(12);
+	file.write(TO_PCHAR(this->frame_count), 4);
 }
 
 void KleiAnim::Binary::BuildWriter::add(Common::SymbolNode& sym)
