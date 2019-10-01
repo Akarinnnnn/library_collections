@@ -3,6 +3,7 @@
 
 //cnm我决定内嵌一个pugixml
 #include "..\thirdparty\pugixml.hpp"
+#include <utility>
 
 using namespace std::string_literals;
 using pugi::xml_node;
@@ -120,14 +121,53 @@ void KleiAnim::BuildBin2XML(Binary::BuildReader& binary, std::filesystem::path x
 	doc.save_file(xmlpath.c_str(), "  ", 1u, pugi::encoding_utf8);
 }
 
-void build2bin(pugi::xml_document& document, path&& outfile)
+void build2bin(pugi::xml_document& doc, path&& outfile)
 {
+	using namespace KleiAnim;
+	using KleiAnim::Common::hash;
 
+	Binary::BuildWriter wb(outfile);
+	
+
+	wb.build_name = doc.select_single_node("Build").node().attribute("name").as_string();
+
+	auto xsyms = doc.select_nodes("Build/Symbol");//xml symbols
+
+	Common::SymbolNode sym{};
+	for (auto& _xsym : xsyms)
+	{
+		auto xsym = _xsym.node();
+		auto sym_name = xsym.attribute("name").as_string();
+
+		unsigned int name_hash = hash(sym_name);
+		sym.name_hash = name_hash;
+		wb.add_hashstringpair(name_hash, sym_name);
+
+		auto xframes = xsym.children("Frame");
+
+		Common::BuildFrameNode frame{};
+		for (auto& xframe : xframes)
+		{
+			frame.x = xframe.attribute("x").as_float();
+			frame.y = xframe.attribute("y").as_float();
+			frame.w = xframe.attribute("w").as_float();
+			frame.h = xframe.attribute("h").as_float();
+
+			frame.frame_number = xframe.attribute("framenum").as_uint();
+			frame.duration = xframe.attribute("duration").as_uint();
+
+			sym.frames.push_back(frame);
+		}
+
+		wb.add(sym);
+	}
+
+	wb.writefile();
 }
 
-void anim2bin(pugi::xml_document& document, path&& outfile)
+void anim2bin(pugi::xml_document& doc, path&& outfile)
 {
-
+	throw std::exception(__FUNCTION__"\n----------NOT IMPLEMENTED----------");
 }
 
 void KleiAnim::XML2Bin(std::filesystem::path xmlpath, std::filesystem::path outdir)

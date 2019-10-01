@@ -664,6 +664,16 @@ void KleiAnim::Binary::BuildWriter::add(const std::array<Common::AlphaVertexNode
 	}
 }
 
+void KleiAnim::Binary::BuildWriter::add_hashstringpair(unsigned int hash, std::string&& string)
+{
+	this->str_table.insert(std::make_pair(hash, string));
+}
+
+void KleiAnim::Binary::BuildWriter::add_hashstringpair(unsigned int hash, std::string& string)
+{
+	this->str_table.insert(std::make_pair(hash, string));
+}
+
 std::wstring KleiAnim::Common::BuildBase::ToString()
 {
 	using std::wostringstream;

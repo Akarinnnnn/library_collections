@@ -241,6 +241,8 @@ namespace KleiAnim
 			BuildWriter(const std::filesystem::path & out, const BuildBase & base);
 			~BuildWriter();
 
+			using BuildBase::build_name;
+
 			/// <summary>
 			/// 将内容写入到文件
 			/// </summary>
@@ -287,6 +289,10 @@ namespace KleiAnim
 			/// <created>Fa鸽,2019/8/2</created>
 			/// <changed>Fa鸽,2019/8/2</changed>
 			void add(const std::array<Common::AlphaVertexNode,6>& vertices);
+
+			void add_hashstringpair(unsigned int hash, std::string&& string);
+			void add_hashstringpair(unsigned int hash, std::string& string);
+
 
 			/// <summary>输出文件的路径</summary>
 			std::filesystem::path out;
