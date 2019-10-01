@@ -176,6 +176,8 @@
     <ClInclude Include="KleiAnim\common\export.h" />
     <ClInclude Include="KleiAnim\Xml.hpp" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="thirdparty\pugiconfig.hpp" />
+    <ClInclude Include="thirdparty\pugixml.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
@@ -206,6 +208,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="thirdparty\pugixml.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="KleiAnim\XML Schema\XmlAnimation.xsd">

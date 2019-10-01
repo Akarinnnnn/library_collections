@@ -28,6 +28,12 @@
     <Filter Include="头文件\KleiAnim\common">
       <UniqueIdentifier>{0d1c72a2-3f8d-4e92-8a65-c5c2b6db22ca}</UniqueIdentifier>
     </Filter>
+    <Filter Include="头文件\第三方">
+      <UniqueIdentifier>{8efc7de2-5478-438b-9a6d-3b6a2cf34559}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\第三方">
+      <UniqueIdentifier>{07e0c763-41e0-47af-a463-4d832190d2cd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -51,6 +57,12 @@
     <ClInclude Include="KleiAnim\common\export.h">
       <Filter>头文件\KleiAnim\common</Filter>
     </ClInclude>
+    <ClInclude Include="thirdparty\pugiconfig.hpp">
+      <Filter>头文件\第三方</Filter>
+    </ClInclude>
+    <ClInclude Include="thirdparty\pugixml.hpp">
+      <Filter>头文件\第三方</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -70,6 +82,9 @@
     </ClCompile>
     <ClCompile Include="KleiAnim\Xml.cpp">
       <Filter>源文件\KleiAnim</Filter>
+    </ClCompile>
+    <ClCompile Include="thirdparty\pugixml.cpp">
+      <Filter>源文件\第三方</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

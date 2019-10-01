@@ -419,6 +419,11 @@ const Common::BuildFrameNode& KleiAnim::Binary::BuildReader::frame(const size_t 
 	return symbols.at(sym).frames.at(i);
 }
 
+std::string KleiAnim::Binary::BuildReader::de_hash(const unsigned int hash) const
+{
+	return str_table.at(hash);
+}
+
 KleiAnim::Binary::AnimationWriter::AnimationWriter(const std::filesystem::path& out) :out(out)
 {
 	cc4 = valid_cc4;

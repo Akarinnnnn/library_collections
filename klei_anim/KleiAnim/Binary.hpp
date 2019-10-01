@@ -169,7 +169,20 @@ namespace KleiAnim
 			/// <returns></returns>
 			/// <created>Fa鸽,2019/8/2</created>
 			/// <changed>Fa鸽,2019/8/2</changed>
-			const Common::BuildFrameNode& frame(const size_t sym, const size_t i) const;			
+			const Common::BuildFrameNode& frame(const size_t sym, const size_t i) const;
+
+			/// <summary>
+			/// 返回hash对应的字符串，建议结合std::move使用
+			/// </summary>
+			/// <param name="hash">哈希值</param>
+			/// <returns>std::string</returns>
+			/// <example>
+			/// <c>string name = std::move(anim.de_hash(name_hash));</c>
+			/// </example>
+			/// <created>Fa鸽,2019/7/29</created>
+			/// <changed>Fa鸽,2019/10/1</changed>
+			std::string de_hash(const unsigned int hash) const;
+
 		};
 
 		class EXPORT_API AnimationWriter :public Common::AnimationBase
