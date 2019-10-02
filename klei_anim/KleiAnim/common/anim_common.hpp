@@ -74,40 +74,40 @@ namespace KleiAnim
 		enum class Facing : unsigned char
 		{
 			/// <summary>右</summary>
-			right = 1,
+			Right = 1,
 
 			/// <summary>上</summary>
-			up = 1 << 1,
+			Up = 1 << 1,
 
 			/// <summary>左</summary>
-			left = 1 << 2,
+			Left = 1 << 2,
 
 			/// <summary>下</summary>
-			down = 1 << 3,
+			Down = 1 << 3,
 
 			/// <summary>右上</summary>
-			upright = 1 << 4,
+			UpRight = 1 << 4,
 
 			/// <summary>左上</summary>
-			upleft = 1 << 5,
+			UpLeft = 1 << 5,
 
 			/// <summary>右下</summary>
-			downright = 1 << 6,
+			DownRight = 1 << 6,
 
 			/// <summary>左下</summary>
-			downleft = 1 << 7,
+			DownLeft = 1 << 7,
 
 			/// <summary>上下左右</summary>
-			all90 = up | left | right | down,
+			All90 = Up | Left | Right | Down,
 
 			/// <summary>四个角</summary>
-			all45 = upright | upleft | downleft | downright,
+			All45 = UpRight | UpLeft | DownLeft | DownRight,
 
 			/// <summary>所有朝向</summary>
-			all = 0xFFUi8,
+			All = 0xFFUi8,
 
 			/// <summary>这不可能！！</summary>
-			invalid = 0
+			Invalid = 0
 		};
 
 		/// <summary>
@@ -120,7 +120,7 @@ namespace KleiAnim
 
 			BinaryFileBase() = default;
 
-			BinaryFileBase(std::map<unsigned int, std::string> string_table) :str_table(string_table)
+			BinaryFileBase(const std::map<unsigned int, std::string> & string_table) :str_table(string_table)
 			{
 
 			}
@@ -216,7 +216,7 @@ namespace KleiAnim
 			std::string name;
 
 			/// <summary>朝向</summary>
-			Facing facing = Facing::all;
+			Facing facing = Facing::All;
 
 			/// <summary>根符号哈希</summary>
 			unsigned int rootsym_hash = 0;

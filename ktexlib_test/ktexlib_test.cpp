@@ -6,7 +6,7 @@
 #include <filesystem>
 #include <fstream>
 #include <charconv>
-#include "pugixml.hpp"
+#include "thirdparty/pugixml.hpp"
 #include "../ktexlib_dymanic/KtexAtlas.h"
 
 using namespace ktexlib;

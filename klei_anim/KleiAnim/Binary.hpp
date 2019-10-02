@@ -13,6 +13,31 @@ namespace KleiAnim
 {
 	namespace Binary
 	{
+		
+		/// <summary>
+		/// .bin文件的类型
+		/// </summary>
+		enum class BinaryType : unsigned char
+		{
+			
+			/// <summary>假的</summary>
+			Neither = 0,
+			/// <summary>Build</summary>
+			Build = 1,
+			/// <summary>Animation</summary>
+			Animation = 2
+		};
+
+
+		/// <summary>
+		/// 检查bin文件的类型
+		/// </summary>
+		/// <param name="filepath">路径</param>
+		/// <returns></returns>
+		/// <created>Fa鸽,2019/10/2</created>
+		/// <changed>Fa鸽,2019/10/2</changed>
+		BinaryType CheckFileType(std::filesystem::path filepath);
+
 		/// <summary>
 		/// anim.bin读取器
 		/// </summary>
@@ -96,7 +121,7 @@ namespace KleiAnim
 		public:
 			BuildReader() = delete;
 			BuildReader(const std::filesystem::path & buildpath);
-			BuildReader(const Common::BuildBase& base):BuildBase(base) {}
+			BuildReader(const Common::BuildBase & base):BuildBase(base) {}
 
 
 			std::vector<Common::SymbolNode>::const_iterator begin() const;
@@ -184,7 +209,10 @@ namespace KleiAnim
 			std::string de_hash(const unsigned int hash) const;
 
 		};
-
+	
+		/// <summary>
+		/// 创建anim.bin，用于写入指定的文件/流
+		/// </summary>
 		class EXPORT_API AnimationWriter :public Common::AnimationBase
 		{
 		public:
@@ -231,6 +259,9 @@ namespace KleiAnim
 			std::filesystem::path out;
 		};
 
+		/// <summary>
+		/// 创建build.bin，用于写入指定的文件/流
+		/// </summary>
 		class EXPORT_API BuildWriter :public Common::BuildBase
 		{
 		public:

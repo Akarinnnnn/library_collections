@@ -1,4 +1,4 @@
-#include "..\\pch.h"
+#include "../pch.h"
 #include "Xml.hpp"
 
 //cnm我决定内嵌一个pugixml
@@ -21,7 +21,7 @@ void KleiAnim::AnimBin2XML(std::filesystem::path binary, std::filesystem::path x
 {
 	Binary::AnimationReader bin(binary);
 	//static_cast不行,dymanic_cast没有虚函数不能用
-	AnimBin2XML((Common::AnimationBase&)(bin), xmlpath);
+	AnimBin2XML(bin, xmlpath);
 }
 
 void KleiAnim::AnimBin2XML(Binary::AnimationReader& binary, std::filesystem::path xmlpath)
@@ -34,8 +34,8 @@ void KleiAnim::AnimBin2XML(Binary::AnimationReader& binary, std::filesystem::pat
 	{
 		auto xanim = anims.append_child("anim");//xml anim
 
-		xanim.append_attribute("name").set_value(ToString(animation.name.c_str()).c_str());
-		xanim.append_attribute("root").set_value(ToString(binary.de_hash(animation.rootsym_hash).c_str()).c_str());
+		xanim.append_attribute("name").set_value(animation.name.c_str());
+		xanim.append_attribute("root").set_value(binary.de_hash(animation.rootsym_hash).c_str());
 		xanim.append_attribute("numframes").set_value(animation.frames.size());
 		xanim.append_attribute("framerate").set_value(animation.frame_rate);
 
@@ -98,8 +98,9 @@ void KleiAnim::BuildBin2XML(Binary::BuildReader& binary, std::filesystem::path x
 {
 	pugi::xml_document doc;
 	auto xroot = doc.append_child("Build");
-	xroot.append_attribute("name").set_value(ToString(binary.name().c_str()).c_str());
+	xroot.append_attribute("name").set_value(binary.name().c_str());
 
+	//symbol
 	for (auto& sym : binary)
 	{
 		auto xsym = xroot.append_child("Symbol");
@@ -118,6 +119,19 @@ void KleiAnim::BuildBin2XML(Binary::BuildReader& binary, std::filesystem::path x
 		}
 	}
 
+	//atlas
+	for (size_t atlas_i = 0; atlas_i < binary.atlas_count(); atlas_i++)
+	{
+		auto& atlas = binary.atlas(atlas_i);
+		xroot.append_child("Atlas").append_attribute("name").set_value(atlas.name.c_str());
+	}
+
+	//alpha vertices
+	/*for (size_t av_i = 0; av_i < bina; av_i++)
+	{
+
+	}*/
+
 	doc.save_file(xmlpath.c_str(), "  ", 1u, pugi::encoding_utf8);
 }
 
@@ -129,7 +143,7 @@ void build2bin(pugi::xml_document& doc, path&& outfile)
 	Binary::BuildWriter wb(outfile);
 	
 
-	wb.build_name = doc.select_single_node("Build").node().attribute("name").as_string();
+	wb.build_name = doc.child("Build").attribute("name").as_string();
 
 	auto xsyms = doc.select_nodes("Build/Symbol");//xml symbols
 

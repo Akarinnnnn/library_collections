@@ -7,6 +7,7 @@
 #include "../klei_anim/KleiAnim/common/anim_common.hpp"
 #include "../klei_anim/KleiAnim/Binary.hpp"
 #include "../klei_anim/KleiAnim/common/exceptions.hpp"
+#include "../klei_anim/KleiAnim/Xml.hpp"
 #include <filesystem>
 #include <fstream>
 #include <vector>
@@ -417,16 +418,17 @@ namespace ktexlibtest
 				}
 			}
 		}
-	private:
 
-		bool Contains(std::vector<KleiAnim::Common::ElementNode>& actual, KleiAnim::Common::ElementNode& excepted_elem)
+		TEST_METHOD(AnimToXML)
 		{
-			for (auto& actual_elem : actual)
-				if(excepted_elem == actual_elem)
-					return true;
-
-			return false;
+			KleiAnim::AnimBin2XML("anim_test.bin","animation.test.xml");
 		}
+
+		TEST_METHOD(BuildToXML)
+		{
+			KleiAnim::BuildBin2XML("build_test.bin", "build.test.xml");
+		}
+	private:
 
 		void mt_read_elem(const unsigned int count,
 			std::vector<::KleiAnim::Common::ElementNode>& out,

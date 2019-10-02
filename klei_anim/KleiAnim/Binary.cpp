@@ -146,7 +146,7 @@ AnimationReader::AnimationReader(const std::filesystem::path & animpath)
 			anim.name = Common::read_str(file);
 			file.read(TO_PCHAR(anim.facing), 1);
 
-			if (anim.facing != Common::Facing::all)
+			if (anim.facing != Common::Facing::All)
 			{
 				KleiAnimLog::write() << animpath << LOG(" 不是一段全朝向的动画。");
 			}
@@ -700,4 +700,27 @@ std::wstring KleiAnim::Common::BuildBase::ToString()
 	}
 
 	return o.str();
+}
+
+BinaryType KleiAnim::Binary::CheckFileType(std::filesystem::path filepath)
+{
+	using std::ifstream;
+	ifstream ifs;
+	ifs.setf(ifstream::binary | ifstream::in);
+	ifs.exceptions(ifstream::badbit | ifstream::failbit | ifstream::eofbit);
+	ifs.open(filepath);
+
+	constexpr unsigned int bild = 0x444C4942;
+	constexpr unsigned int anim = 0x4D494E41;
+
+	unsigned int read = 0;
+	ifs.read(TO_PCHAR(read), 4);
+	ifs.close();
+
+	if (read == bild)
+		return BinaryType::Build;
+	if (read == anim)
+		return BinaryType::Animation;
+	
+	return BinaryType::Neither;
 }
