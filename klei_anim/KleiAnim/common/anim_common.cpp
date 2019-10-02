@@ -18,6 +18,16 @@ unsigned int KleiAnim::Common::hash(std::string&& s)
 	return hash;
 }
 
+unsigned int KleiAnim::Common::hash(std::string& s)
+{
+	unsigned int hash = 0;
+	for (const char v : s)
+	{
+		hash = (v + (hash << 6) + (hash << 16) - hash) & 0xFFFFFFFFU;
+	}
+	return hash;
+}
+
 string KleiAnim::Common::read_str(std::istream& f)
 {
 	unsigned int strsize;

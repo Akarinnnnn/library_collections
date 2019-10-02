@@ -245,6 +245,16 @@ namespace KleiAnim
 		unsigned int EXPORT_API hash(std::string&& s);
 
 		/// <summary>
+		/// 计算字符串的哈希值
+		/// </summary>
+		/// <param name="s">将计算哈希的字符串</param>
+		/// <returns>哈希值</returns>
+		/// <created>Fa鸽,2019/7/22</created>
+		/// <changed>Fa鸽,2019/7/22</changed>
+		unsigned int EXPORT_API hash(std::string& s);
+
+
+		/// <summary>
 		/// 读取bin文件中的一条字符串（非哈希化字符串）
 		/// </summary>
 		/// <param name="f">流，必须行进到字符串所在的位置</param>

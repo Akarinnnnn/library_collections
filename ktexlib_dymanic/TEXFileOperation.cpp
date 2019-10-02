@@ -6,7 +6,7 @@
 #include "TEXFileOperation.h"
 #include "resource1.h"
 #include <filesystem>
-#include "KTEXAtlas.h"
+//#include "KTEXAtlas.h"
 #ifdef _WIN32
 #include <Windows.h>
 inline ktexlib::KTEXFileOperation::RGBAv2 add_surpise()
@@ -151,29 +151,29 @@ __API void ktexlib::KTEXFileOperation::KTEX::Convert()
 		}
 
 		//转换
-		char* data = nullptr;
+		unsigned char* data = nullptr;
 		switch (Info.pixelformat)
 		{
 			using namespace squish;
 		case(pixfrm::ARGB):
 			temp.size = img.data.size();
-			temp.data = (char*)img.data.data();
+			temp.data = img.data.data();
 			break;
 		case(pixfrm::DXT1):
 			temp.size = GetStorageRequirements(img.width, img.height, kDxt1);
-			data = new char[temp.size];
+			data = new unsigned char[temp.size];
 			CompressImage(img.data.data(), img.width, img.height, data, kDxt1);
 			temp.data = data;
 			break;
 		case(pixfrm::DXT3):
 			temp.size = GetStorageRequirements(img.width, img.height, kDxt3);
-			data = new char[temp.size];
+			data = new unsigned char[temp.size];
 			CompressImage(img.data.data(), img.width, img.height, data, kDxt3);
 			temp.data = data;
 			break;
 		case(pixfrm::DXT5):
 			temp.size = GetStorageRequirements(img.width, img.height, kDxt5);
-			data = new char[temp.size];
+			data = new unsigned char[temp.size];
 			CompressImage(img.data.data(), img.width, img.height, data, kDxt5);
 			temp.data = data;
 			break;
@@ -199,13 +199,14 @@ __API void ktexlib::KTEXFileOperation::KTEX::Convert()
 	{
 		file.write((char*)(&mipmap), 6);
 		file.write((char*)(&mipmap.size), 4);
-		file.write(mipmap.data, mipmap.size);
+		file.write((char*)mipmap.data, mipmap.size);
 	}
 	file.close();
 
 	//生成XML
-	Atlas::atlas xmlop(filesystem::path(output).replace_extension(".xml").wstring(), mipmaps);
-	xmlop.xmlgen();
+	//放弃这种操作......
+	/*Atlas::atlas xmlop(filesystem::path(output).replace_extension(".xml").wstring(), mipmaps);
+	xmlop.xmlgen();*/
 }
 
 __API void ktexlib::KTEXFileOperation::KTEX::LoadKTEX(std::filesystem::path filepath)
@@ -228,8 +229,8 @@ __API void ktexlib::KTEXFileOperation::KTEX::LoadKTEX(std::filesystem::path file
 		mipmapv2& target = mipmaps[i];
 		file.read((char*)(&target), 6);
 		file.read((char*)(&target.size), 4);//估计是对齐问题
-		auto temp = new char[target.size];
-		file.read(temp, target.size);
+		auto temp = new unsigned char[target.size];
+		file.read((char*)temp, target.size);
 		target.data = temp;
 	}
 	file.close();

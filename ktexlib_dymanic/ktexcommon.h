@@ -75,7 +75,7 @@ namespace ktexlib
 				return this->msg;
 			}
 
-			int const code() noexcept
+			int code() const noexcept
 			{
 				return _code;
 			}
@@ -113,11 +113,24 @@ namespace ktexlib
 
 		struct mipmapv2
 		{
+			mipmapv2() = default;
+			mipmapv2(const mipmapv2 & rhs)
+			{
+				memcpy_s(this, 6, &rhs, 6);
+				this->size = rhs.size;
+				this->data = new unsigned char[size];
+				memcpy_s(data, size, rhs.data, size);
+			}
+			mipmapv2(const mipmapv2 && rhs) noexcept
+			{
+				memcpy_s(this, sizeof(mipmapv2), &rhs, sizeof(mipmapv2));
+			}
+
 			unsigned short width = 0;
 			unsigned short height = 0;
 			unsigned short pitch = 0;
 			unsigned int size = 0;
-			char* data = nullptr;
+			unsigned char* data = nullptr;
 			__API ~mipmapv2();
 		};
 

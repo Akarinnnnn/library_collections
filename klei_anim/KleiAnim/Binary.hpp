@@ -223,6 +223,10 @@ namespace KleiAnim
 			/// <changed>Fa鸽,2019/8/2</changed>
 			void add(Common::AnimationNode& anim);
 
+			void add_hashstringpair(unsigned int hash, std::string&& string);
+			void add_hashstringpair(unsigned int hash, std::string& string);
+
+
 			/// <summary>输出文件的路径</summary>
 			std::filesystem::path out;
 		};

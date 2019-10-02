@@ -674,6 +674,16 @@ void KleiAnim::Binary::BuildWriter::add_hashstringpair(unsigned int hash, std::s
 	this->str_table.insert(std::make_pair(hash, string));
 }
 
+void KleiAnim::Binary::AnimationWriter::add_hashstringpair(unsigned int hash, std::string&& string)
+{
+	this->str_table.insert(std::make_pair(hash, string));
+}
+
+void KleiAnim::Binary::AnimationWriter::add_hashstringpair(unsigned int hash, std::string& string)
+{
+	this->str_table.insert(std::make_pair(hash, string));
+}
+
 std::wstring KleiAnim::Common::BuildBase::ToString()
 {
 	using std::wostringstream;

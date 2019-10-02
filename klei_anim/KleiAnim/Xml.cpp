@@ -167,7 +167,29 @@ void build2bin(pugi::xml_document& doc, path&& outfile)
 
 void anim2bin(pugi::xml_document& doc, path&& outfile)
 {
-	throw std::exception(__FUNCTION__"\n----------NOT IMPLEMENTED----------");
+	using namespace KleiAnim;
+	using KleiAnim::Common::hash;
+	using std::string;
+	using uint = unsigned int;
+
+	Binary::AnimationWriter wb(outfile);
+	Common::AnimationNode anim{};
+
+	auto xanims = doc.select_nodes("Anims/anim");
+	for (auto& _xanim : xanims)
+	{
+		pugi::xml_node xanim = _xanim.node();
+
+		anim.name = xanim.attribute("name").as_string();
+		string rootname = xanim.attribute("root").as_string();
+		anim.rootsym_hash = hash(rootname);
+		wb.add_hashstringpair(anim.rootsym_hash, rootname);
+
+		
+	}
+
+
+	//throw std::exception(__FUNCTION__"\n----------NOT IMPLEMENTED----------");
 }
 
 void KleiAnim::XML2Bin(std::filesystem::path xmlpath, std::filesystem::path outdir)

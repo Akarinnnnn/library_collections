@@ -27,11 +27,16 @@ namespace ktexlib
 		public:
 			__API void PushRGBA(RGBAv2 RGBA_array);
 			__API void PushRGBA(RGBAv2 RGBA_array, unsigned int pitch);
+			//RGBAv2 -> KTEX
 			__API void Convert();
 			__API void LoadKTEX(std::filesystem::path filepath);
 			__API mipmapv2 GetMipmapByPitch(unsigned int pitch);
 			__API mipmapv2 GetMipmap(unsigned int pitch);
+
+			//KTEX -> RGBAv2
 			__API RGBAv2 GetImageFromMipmap(unsigned int pitch);
+
+			//KTEX -> RGBAv2
 			__API RGBAv2 GetImageArray(unsigned int pitch);
 			__API void clear();
 			__API KTEX();
