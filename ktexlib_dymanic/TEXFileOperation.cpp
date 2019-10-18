@@ -1,11 +1,15 @@
 /***************************
 * Encoding: GB2312
 ***************************/
-#include "lodepng.h"
+//#include "lodepng.h"
 #include "./squish/squish.h"
 #include "TEXFileOperation.h"
 #include "resource1.h"
 #include <filesystem>
+#include <fstream>
+#include <vector>
+#include <iostream>
+#include <algorithm>
 //#include "KTEXAtlas.h"
 #ifdef _WIN32
 #include <Windows.h>
@@ -337,3 +341,5 @@ __API ktexlib::KTEXFileOperation::mipmapv2::~mipmapv2()
 	this->data = nullptr;
 	this->size = 0;
 }
+
+

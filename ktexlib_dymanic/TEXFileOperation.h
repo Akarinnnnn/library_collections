@@ -4,10 +4,7 @@
 #pragma once
 //已经相当于祖传代码了，年代久远
 #include <string>
-#include <fstream>
-#include <vector>
-#include <iostream>
-#include <algorithm>
+
 #include <filesystem>
 #include <exception>
 #include "ktexcommon.h"
@@ -21,10 +18,15 @@ namespace ktexlib
 {
 	namespace KTEXFileOperation
 	{
-
 		class KTEX
 		{
 		public:
+
+			bool operator==(KTEX& rhs)
+			{
+				return this == (&rhs);
+			}
+
 			__API void PushRGBA(RGBAv2 RGBA_array);
 			__API void PushRGBA(RGBAv2 RGBA_array, unsigned int pitch);
 			//RGBAv2 -> KTEX
@@ -51,8 +53,42 @@ namespace ktexlib
 			mipmaps mipmaps;
 			KTEXHeader Header;
 			imgs RGBA_vectors;
+
+			friend class RgbaItereator;
+			friend class MipmapIterator;
 		};
-		//__API void KTEX2PNG(KTEX target);
+
+		class RgbaItereator
+		{
+		public:
+			RgbaItereator(ktexlib::KTEXFileOperation::KTEX& ktex) : images(ktex.RGBA_vectors) {}
+			imgs::iterator begin()
+			{
+				return images.begin();
+			}
+			imgs::iterator end()
+			{
+				return images.end();
+			}
+		private:
+			imgs& images;
+		};
+		class MipmapIterator
+		{
+		public:
+			MipmapIterator(ktexlib::KTEXFileOperation::KTEX& ktex) : mips(ktex.mipmaps) {}
+			mipmaps::iterator begin()
+			{
+				return mips.begin();
+			}
+			mipmaps::iterator end() 
+			{
+				return mips.end();
+			}
+		private:
+			mipmaps& mips;
+		};
+
 		__API KTEX operator+(KTEX dest, RGBAv2 src);
 	}
 }
