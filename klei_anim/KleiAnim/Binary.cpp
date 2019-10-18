@@ -709,36 +709,38 @@ BinaryType KleiAnim::Binary::CheckFileType(std::filesystem::path filepath)
 	ifs.setf(ifstream::binary | ifstream::in);
 	ifs.exceptions(ifstream::badbit | ifstream::failbit | ifstream::eofbit);
 	ifs.open(filepath);
+	using std::cerr;
 
 	if (!ifs.is_open())
-		throw std::runtime_error("打开失败");
+		cerr<<"打开失败";
 
 	constexpr unsigned int bild = 0x444C4942;
 	constexpr unsigned int anim = 0x4D494E41;
 
-	unsigned int read = 0;
+	unsigned int readout = 0;
 
 
 	try
 	{
-		ifs.read(TO_PCHAR(read), 4);
+		ifs.read(TO_PCHAR(readout), 4);
 	}
 	catch (const ifstream::failure& fail)
 	{
 		ifs.close();
+		cerr << fail.what();
 		return BinaryType::Neither;
 	}
-	catch (std::exception&)
+	catch (std::exception& e)
 	{
 		ifs.close();
-		throw;
+		cerr << e.what();
 	}
 
 	ifs.close();
 
-	if (read == bild)
+	if (readout == bild)
 		return BinaryType::Build;
-	if (read == anim)
+	if (readout == anim)
 		return BinaryType::Animation;
 	
 	return BinaryType::Neither;

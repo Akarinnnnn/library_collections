@@ -36,7 +36,7 @@ namespace KleiAnim
 		/// <returns></returns>
 		/// <created>Fa¸ë,2019/10/2</created>
 		/// <changed>Fa¸ë,2019/10/2</changed>
-		BinaryType CheckFileType(std::filesystem::path filepath);
+		extern "C" EXPORT_API BinaryType CheckFileType(std::filesystem::path filepath);
 
 		/// <summary>
 		/// anim.bin¶ÁÈ¡Æ÷

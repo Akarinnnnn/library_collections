@@ -230,6 +230,21 @@ void KleiAnim::XML2Bin(std::filesystem::path xmlpath, std::filesystem::path outd
 		build2bin(doc, outdir / L"build.bin");
 		return;
 	}
-
+	
 	throw std::invalid_argument("这可能是个假的xml文档，路径：" + outdir.string());
+}
+
+EXPORT_API void KleiAnim::AnimBin2XML(const char8_t* in_path, const char8_t* out_path)
+{
+	AnimBin2XML(path(in_path), path(out_path));
+}
+
+EXPORT_API void KleiAnim::BuildBin2XML(const char8_t* in_path, const char8_t* out_path)
+{
+	BuildBin2XML(path(in_path), path(out_path));
+}
+
+EXPORT_API void KleiAnim::XML2Bin(const char8_t* in_path, const char8_t* out_path)
+{
+	XML2Bin(path(in_path), path(out_path));
 }
