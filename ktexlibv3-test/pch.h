@@ -8,9 +8,8 @@
 #define PCH_H
 
 // 添加要在此处预编译的标头
-#include "framework.h"
-//exitcode为0时不退出
-void ErrorMsgbox(const wchar_t* format, const HRESULT hr, int exitcode);
-
-
+#include <vector>
+#include <iostream>
+#include <chrono>
+#include <Windows.h>
 #endif //PCH_H

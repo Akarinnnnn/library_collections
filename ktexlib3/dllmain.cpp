@@ -3,14 +3,11 @@
 #include <combaseapi.h>
 #include <wincodec.h>
 #include <wil/com.h>
-extern wil::com_ptr<IWICImagingFactory> WIC_Factory;
 
-void ErrorMsgbox(const wchar_t * format, const HRESULT hr,int exitcode)
+
+namespace wicobj
 {
-	wchar_t message[64]{ 0 };
-	wsprintfW(message, format, hr);
-	MessageBoxW(nullptr, message, L"什么情况？？？", MB_ICONERROR | MB_OK);
-	exit(exitcode);
+	wil::com_ptr<IWICImagingFactory> factory;
 }
 
 BOOL APIENTRY DllMain( HMODULE hModule,
@@ -29,15 +26,16 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 		{
 			ErrorMsgbox(L"加载COM失败(hresult = %#08X)，即将退出", hr, 10);
 		}
-		if (FAILED(CoCreateInstance(CLSID_WICImagingFactory, nullptr, CLSCTX_ALL, IID_IWICImagingFactory2, (LPVOID*)&WIC_Factory)))
+		if (FAILED(CoCreateInstance(CLSID_WICImagingFactory, nullptr, CLSCTX_ALL, IID_IWICImagingFactory2, (LPVOID*)&wicobj::factory)))
 		{
-			hr = CoCreateInstance(CLSID_WICImagingFactory, nullptr, CLSCTX_ALL, IID_IWICImagingFactory, (LPVOID*)&WIC_Factory);
+			hr = CoCreateInstance(CLSID_WICImagingFactory, nullptr, CLSCTX_ALL, IID_IWICImagingFactory, (LPVOID*)&wicobj::factory);
 			if (FAILED(hr))
 			{
 				ErrorMsgbox(L"创建WIC工厂失败(hresult = %#08X)，即将退出\n这个问题常见于精简版系统", hr, 11);
 			}
 		}
-		WIC_Factory->AddRef();
+		//wicobj::factory->AddRef();
+		//wicobj::png->AddRef();
 	}
 		break;
     case DLL_THREAD_ATTACH:

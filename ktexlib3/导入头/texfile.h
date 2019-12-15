@@ -1,8 +1,18 @@
 #pragma once
 
+#if defined(KTEXLIB3_EXPORTS) 
+#if defined(_MSC_VER)
+#define	KTEXLIB3_EXPORT __declspec(dllexport)
+#else
+#define KTEXLIB3_EXPORT __declspec(dllimport)
+#endif
+#else
+#define KTEXLIB3_EXPORT
+#endif 
+
 #include <vector>
 #include <filesystem>
-
+#include <fstream>
 //#define PARALLEL_COMPRESS //去掉注释，在windows下进行多线程bc压缩
 
 namespace ktexlib
@@ -22,8 +32,6 @@ namespace ktexlib
 	template<typename T,typename array_t>
 	struct ro_container_property
 	{
-	
-
 		ro_container_property(const array_t& arr):arr(arr) {}
 
 		const T& operator() (size_t i)
@@ -36,18 +44,37 @@ namespace ktexlib
 			return (arr)[i];
 		}
 
-		array_t::const_iterator begin() { return arr.begin(); }
-		array_t::const_iterator end() { return arr.end(); }
+		auto begin() { return arr.cbegin(); }
+		auto end() { return arr.cend(); }
 	private:
 		const array_t& arr;
 	};
 
-	namespace v3
+	template<typename T>
+	struct ro_property
+	{
+		ro_property(T& val) :val(val)
+		{
+
+		}
+
+		operator T()
+		{
+			return val;
+		}
+		T operator() ()
+		{
+			return val;
+		}
+		T& val;
+	};
+
+	namespace v3detail
 	{
 		/// <summary>
 		/// 材质的像素格式
 		/// </summary>
-		enum class PixelFormat
+		enum class PixelFormat :unsigned short
 		{
 			/// <summary>未知格式</summary>
 			unknown = 0,
@@ -63,11 +90,10 @@ namespace ktexlib
 			r8g8b8 = 7,
 		};
 
-
 		/// <summary>
 		/// 材质对应平台
 		/// </summary>
-		enum class Platform
+		enum class Platform : unsigned char
 		{
 			/// <summary>OpenGL，适合饥荒PC版，可以不生成mipmap</summary>
 			opengl = 12,
@@ -79,56 +105,124 @@ namespace ktexlib
 			universal = 0
 		};
 
-		struct mipmap
+		/// <summary>
+		/// 材质种类
+		/// </summary>
+		enum class textureType : unsigned char
 		{
-			mipmap(int32_t w,int32_t h,int32_t pitch):data(){}
-			mipmap(const mipmap& other) :mipmap(other.width, other.height, other.pitch,data){}
-			mipmap(const mipmap&& xval):mipmap(xval.width,xval.height,xval.pitch,std::move(xval.data)){}
+			/// <summary>1D</summary>
+			d1 = 1,
+			/// <summary>2D</summary>
+			d2 = 2,
+			/// <summary>3D</summary>
+			d3 = 3,
+			/// <summary>Cubemap，适合2D游戏</summary>
+			cubemap = 4
+		};
 
-			mipmap(const int32_t w, const int32_t h, const int32_t pitch, const std::vector<unsigned char>& data) :
-				width(w), height(h), pitch(pitch)
-			{
-				this->data = data;
-			}
-			mipmap(const int32_t w, const int32_t h, const int32_t pitch, const std::vector<unsigned char>&& data) :
-				width(w), height(h), pitch(pitch)
-			{
-				this->data = std::move(data);
-			}
+		struct Mipmap
+		{
+			Mipmap(int32_t w, int32_t h, int32_t pitch);
+			Mipmap(const Mipmap& other);
+			Mipmap(Mipmap&& xval);
+
+			Mipmap(const int32_t w, const int32_t h, const int32_t pitch, const std::vector<unsigned char>& data);
+			Mipmap(const int32_t w, const int32_t h, const int32_t pitch, std::vector<unsigned char>&& data);
 
 			int32_t width, height, pitch = 0;//pitch是一行的数据长度，以字节为单位
 			std::vector<unsigned char> data;
 		};
 
-		using rgba_image = mipmap;
+		struct RgbaImage : Mipmap {};
 
-		class Ktex final
+		struct KTEXInfo
+		{
+			uint8_t flags = 3ui8;
+			textureType textureType = textureType::d2;
+			PixelFormat pixelFormat = PixelFormat::dxt5;
+			Platform platform = Platform::universal;
+		};
+
+		class Ktex
 		{
 		public:
-			template<typename rgba_iterator>
-			Ktex(rgba_iterator begin,rgba_iterator end):Mipmaps(this->mips)
-			{
-				range rgbas(begin, end);
-				for (auto& i : rgbas)
-				{
-					mips.push_back(do_compress(i,true));
-				}
-			}
+			Ktex() :Mipmaps(this->mips) {}
 
-			ro_container_property<mipmap,std::vector<mipmap>> Mipmaps;
+			template<typename mips_iterator>
+			Ktex(mips_iterator begin, mips_iterator end): mips(begin, end),Mipmaps(this->mips) {}
+
+			void AddMipmap(const Mipmap& mipmap);
+			void AddMipmap(Mipmap&& mipmap);
+
+			ro_container_property<Mipmap, std::vector<Mipmap>> Mipmaps;
+			KTEXInfo info;
 
 			void SaveFile(std::filesystem::path path);
 		private:
-			mipmap do_compress(const rgba_image& rgba, bool multithread, PixelFormat fmt = PixelFormat::dxt5);
-			std::vector<mipmap> mips;
+			std::vector<Mipmap> mips;
+
 		};
 
+		KTEXLIB3_EXPORT Mipmap convert(const RgbaImage& image, bool multithread, PixelFormat fmt);
+	}
+
+	namespace v3
+	{
 		/// <summary>
-		/// 输入文件名，直接转换
+		/// 指定文件名，转换到同一目录
 		/// </summary>
 		/// <param name="filename">文件名</param>
 		/// <created>Fa鸽,2019/11/1</created>
 		/// <changed>Fa鸽,2019/11/15</changed>
-		extern "C" EXPORT_API void gen_bc3universal(char8_t * filename);
+		extern "C" KTEXLIB3_EXPORT void gen_bc3universal(const char8_t* pngpath);
+
+		/// <summary>
+		/// 指定UTF16文件名，转换到同一目录
+		/// </summary>
+		/// <param name="path"></param>
+		/// <returns></returns>
+		/// <created>Fa鸽,2019/11/23</created>
+		/// <changed>Fa鸽,2019/11/23</changed>
+		KTEXLIB3_EXPORT bool gen_bc3universal(const char16_t * path);
+
+		/// <summary>
+		/// 指定宽字符文件名，转换到同一目录
+		/// </summary>
+		/// <param name="path"></param>
+		/// <returns></returns>
+		/// <created>Fa鸽,2019/11/23</created>
+		/// <changed>Fa鸽,2019/11/23</changed>
+		KTEXLIB3_EXPORT bool gen_bc3universal(const wchar_t * path);
+
+		/// <summary>
+		/// 加载一个tex文件
+		/// </summary>
+		/// <param name="path">生存期由调用方管理</param>
+		/// <returns></returns>
+		/// <exception cref="std::invalid_argument">不是ktex</exception>
+		/// <created>Fa鸽,2019/11/23</created>
+		/// <changed>Fa鸽,2019/11/23</changed>
+		KTEXLIB3_EXPORT ktexlib::v3detail::Ktex load_ktex(const char8_t* path);
+
+		/// <summary>
+		/// 加载一个tex文件
+		/// </summary>
+		/// <param name="path">生存期由调用方管理</param>
+		/// <returns></returns>
+		/// <exception cref="std::invalid_argument">不是ktex</exception>
+		/// <created>Fa鸽,2019/11/23</created>
+		/// <changed>Fa鸽,2019/11/23</changed>
+		KTEXLIB3_EXPORT ktexlib::v3detail::Ktex load_ktex(const wchar_t* path);
+
+		/// <summary>
+		/// 加载一个tex文件
+		/// </summary>
+		/// <param name="file">生存期由调用方管理</param>
+		/// <exception cref="std::invalid_argument">不是ktex</exception>
+		/// <returns></returns>
+		/// <created>Fa鸽,2019/11/23</created>
+		/// <changed>Fa鸽,2019/11/23</changed>
+		KTEXLIB3_EXPORT ktexlib::v3detail::Ktex load_ktex(std::ifstream& file);
 	}
+
 }
