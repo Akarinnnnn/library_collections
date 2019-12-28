@@ -1,3 +1,5 @@
 # library_collections
-自己的库的合集
-每个库都有单独的readme
+此仓库已死
+内含
+  二代ktexlib -- 饥荒tex解析库
+  klei_anim -- 饥荒动画文件解析
